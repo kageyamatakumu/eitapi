@@ -1,13 +1,25 @@
 package main
 
 import (
+	"backend/db"
+	"fmt"
 	"net/http"
+	"log"
 
+	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
 
 func main() {
+	// .envファイルを読み込む
+	err := godotenv.Load()
+    if err != nil {
+        log.Fatalln("Error loading .env file")
+    }
+
+	dbConn := db.CreateDB()
+	fmt.Println(dbConn)
 	// インスタンスを作成
 	e := echo.New()
 
