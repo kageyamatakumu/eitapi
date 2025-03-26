@@ -33,7 +33,7 @@ func main() {
 func seed(db *gorm.DB) {
 	admin := model.Admin{
 		Email:    "email@example.com",
-		Password: "eitapi",
+		Password: "$2a$10$xDlV8e5VAvLjNJNZ6gWHrOFoha.Xkdhk.nPq.hIOXLJPM9Ey3AuYm",
 		UserName: "eitapi",
 	}
 	difficulty := model.Difficulty{
