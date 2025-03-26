@@ -12,6 +12,7 @@ func NewRouter(ac controller.IAdminController, wbc controller.IWordBookControlle
 	// 管理者
 	a := e.Group("/admins")
 	a.POST("/", ac.CreateAdmin)
+	a.POST("/login", ac.LoginAdmin)
 
 	// 英単語
 	wb := e.Group("/word_books")
