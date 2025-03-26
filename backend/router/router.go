@@ -6,12 +6,16 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func NewRouter(wc controller.IWordBookController) *echo.Echo {
+func NewRouter(wbc controller.IWordBookController, wc controller.IWordController) *echo.Echo {
 	e := echo.New()
 
 	// 英単語帳
 	wb := e.Group("/word_books")
-	wb.GET("/", wc.GetAllWordBooks)
+	wb.GET("/", wbc.GetAllWordBooks)
+
+	// 英単語
+	w := e.Group("/words")
+	w.GET("/:wordBookID", wc.GetAllWordsForWordBook)
 
 	return e
 }
