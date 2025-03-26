@@ -9,13 +9,10 @@ import (
 func NewRouter(wbc controller.IWordBookController, wc controller.IWordController) *echo.Echo {
 	e := echo.New()
 
-	// 英単語帳
+	// 英単語
 	wb := e.Group("/word_books")
 	wb.GET("/", wbc.GetAllWordBooks)
-
-	// 英単語
-	w := e.Group("/words")
-	w.GET("/:wordBookID", wc.GetAllWordsForWordBook)
+	wb.GET("/:wordBookID/words", wc.GetAllWordsForWordBook)
 
 	return e
 }
