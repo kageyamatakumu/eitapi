@@ -26,6 +26,6 @@ jobs:
       - name: Verify golangci-lint installation
         run: golangci-lint --version
 
-      # golangci-lintの実行
+      # golangci-lintの実行 (backendディレクトリのみを対象)
       - name: Run golangci-lint
-        run: golangci-lint
+        run: golangci-lint ./backend/...
