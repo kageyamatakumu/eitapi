@@ -9,6 +9,7 @@ import (
 
 type IWordBookRepository interface {
 	GetAllWordBook(wordBooks *[]model.WordBook) error
+	CreateWordBook(wordBook *model.WordBook) error
 }
 
 type wordBookRepository struct {
@@ -25,5 +26,15 @@ func (wr *wordBookRepository) GetAllWordBook(wordBooks *[]model.WordBook) error 
 		log.Printf("failed to get all word books: %v", err)
 		return err
 	}
+	return nil
+}
+
+// 英単語帳を新規作成
+func (wr *wordBookRepository) CreateWordBook(wordBook *model.WordBook) error {
+	if err := wr.db.Create(wordBook).Error; err != nil {
+		log.Printf("failed to create word book: %v", err)
+		return err
+	}
+
 	return nil
 }
