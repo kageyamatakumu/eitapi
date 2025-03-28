@@ -16,7 +16,8 @@ func CreateDB() *gorm.DB {
 	if err != nil {
 		log.Fatalln("Error loading .env file")
 	}
-	var url string = fmt.Sprintf("postgres://%s:%s@%s:%s/%s", os.Getenv("POSTGRES_USER"),
+
+	url := fmt.Sprintf("postgres://%s:%s@%s:%s/%s", os.Getenv("POSTGRES_USER"),
 		os.Getenv("POSTGRES_PASSWORD"), os.Getenv("POSTGRES_HOST"),
 		os.Getenv("POSTGRES_PORT"), os.Getenv("POSTGRES_DATABASE"))
 

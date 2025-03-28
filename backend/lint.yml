@@ -1,0 +1,21 @@
+linters:
+  enable:
+    - gocyclo
+    - govet
+    - errcheck
+    - unused
+    - revive
+  disable:
+    - dupl
+    - goimports
+    - golint
+
+run:
+  timeout: 2m
+
+issues:
+  exclude-rules:
+    - text: "error strings should not be capitalized"
+      linters:
+        - revive
+
