@@ -10,6 +10,7 @@ import (
 
 type IWordRepository interface {
 	GetAllWordsForWordBook(wordBookID uint, words *[]model.Word) error
+	CreateWord(word *model.Word) error
 }
 
 type wordRepository struct {
@@ -26,5 +27,15 @@ func (wr *wordRepository) GetAllWordsForWordBook(wordBookID uint, words *[]model
 		log.Printf("failed to get all words for word book: %v", err)
 		return err
 	}
+	return nil
+}
+
+// 英単語を新規作成
+func (wr *wordRepository) CreateWord(word *model.Word) error {
+	if err := wr.db.Create(word).Error; err != nil {
+		log.Printf("failed to create word: %v", err)
+		return err
+	}
+
 	return nil
 }

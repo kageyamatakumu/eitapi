@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"backend/model"
 	"backend/usecase"
 	"net/http"
 	"strconv"
@@ -10,6 +11,7 @@ import (
 
 type IWordController interface {
 	GetAllWordsForWordBook(c echo.Context) error
+	CreateWord(c echo.Context) error
 }
 
 type wordController struct {
@@ -34,4 +36,19 @@ func (wc *wordController) GetAllWordsForWordBook(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 	return c.JSON(http.StatusOK, words)
+}
+
+// 英単語を新規作成
+func (wc *wordController) CreateWord(c echo.Context) error {
+	word := model.Word{}
+	if err := c.Bind(&word); err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
+
+	wordRes, err := wc.wu.CreateWord(word);
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusCreated, wordRes)
 }
