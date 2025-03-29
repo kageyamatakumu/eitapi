@@ -38,3 +38,4 @@ jobs:
         with:
           version: v1.60
           working-directory: ${{ env.WORKING_DIRECTORY }}
+          install-mode: source
