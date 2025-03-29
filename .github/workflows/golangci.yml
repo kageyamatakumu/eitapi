@@ -4,7 +4,11 @@ on: [pull_request]
 
 jobs:
   lint:
+    name: golangci-lint
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./backend
     steps:
       # ソースコードをチェックアウト
       - name: Checkout code
@@ -26,6 +30,6 @@ jobs:
       - name: Verify golangci-lint installation
         run: golangci-lint --version
 
-      # golangci-lintの実行 (backendディレクトリのみを対象)
+      # golangci-lintの実行
       - name: Run golangci-lint
-        run: golangci-lint ./backend/...
+        run: golangci-lint
