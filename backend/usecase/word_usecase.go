@@ -8,6 +8,7 @@ import (
 
 type IWordCase interface {
 	GetAllWordsForWordBook(wordBookID uint) ([]model.Word, error)
+	CreateWord(word model.Word) (model.WordRes, error)
 }
 
 type wordUseCase struct {
@@ -27,4 +28,23 @@ func (wu *wordUseCase) GetAllWordsForWordBook(wordBookID uint) ([]model.Word, er
 	}
 
 	return words, nil
+}
+
+// 英単語を新規作成
+func (wu *wordUseCase) CreateWord(word model.Word) (model.WordRes, error) {
+	if err := wu.wr.CreateWord(&word); err != nil {
+		log.Printf("failed to create word: %v", err)
+		return model.WordRes{}, err
+	}
+
+	resWord := model.WordRes{
+		ID:                  word.ID,
+		EnglishWord:         word.EnglishWord,
+		JapaneseTranslation: word.JapaneseTranslation,
+		Pronunciation:       word.Pronunciation,
+		ExampleSentence:     word.ExampleSentence,
+		WordBookId:          word.WordBookId,
+	}
+
+	return resWord, nil
 }
