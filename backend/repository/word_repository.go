@@ -12,6 +12,7 @@ import (
 
 type IWordRepository interface {
 	GetAllWordsForWordBook(wordBookID uint, words *[]model.Word) error
+	GetWordById(wordID uint, word *model.Word) error
 	CreateWord(word *model.Word) error
 	UpdateWord(word *model.Word, wordId uint) error
 }
@@ -30,6 +31,16 @@ func (wr *wordRepository) GetAllWordsForWordBook(wordBookID uint, words *[]model
 		log.Printf("failed to get all words for word book: %v", err)
 		return err
 	}
+	return nil
+}
+
+// 英単語を取得
+func (wr *wordRepository) GetWordById(wordID uint, word *model.Word) error {
+	if err := wr.db.Where("id = ?", wordID).First(word).Error; err != nil {
+		log.Printf("failed to get word with id %d: %v", wordID, err)
+		return err
+	}
+
 	return nil
 }
 

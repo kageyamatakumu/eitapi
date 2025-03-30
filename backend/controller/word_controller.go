@@ -11,6 +11,7 @@ import (
 
 type IWordController interface {
 	GetAllWordsForWordBook(c echo.Context) error
+	GetWordById(c echo.Context) error
 	CreateWord(c echo.Context) error
 	UpdateWord(c echo.Context) error
 }
@@ -37,6 +38,22 @@ func (wc *wordController) GetAllWordsForWordBook(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 	return c.JSON(http.StatusOK, words)
+}
+
+// 英単語を取得
+func (wc *wordController) GetWordById(c echo.Context) error {
+	id := c.Param("wordID")
+	wordIdInt, err := strconv.Atoi(id)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, "invalid wordID")
+	}
+	wordIdUint := uint(wordIdInt)
+
+	word, err := wc.wu.GetWordById(wordIdUint)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusOK, word)
 }
 
 // 英単語を新規作成
