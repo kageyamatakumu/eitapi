@@ -12,6 +12,7 @@ import (
 type IWordController interface {
 	GetAllWordsForWordBook(c echo.Context) error
 	CreateWord(c echo.Context) error
+	UpdateWord(c echo.Context) error
 }
 
 type wordController struct {
@@ -51,4 +52,26 @@ func (wc *wordController) CreateWord(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusCreated, wordRes)
+}
+
+// 英単語を更新
+func (wc *wordController) UpdateWord(c echo.Context) error {
+	id := c.Param("wordID")
+	wordIDInt, err := strconv.Atoi(id)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, "invalid wordBookID")
+	}
+	wordIDUint := uint(wordIDInt)
+
+	word := model.Word{}
+	if err := c.Bind(&word); err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
+
+	wordRes, err := wc.wu.UpdateWord(word, wordIDUint)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, wordRes)
 }
