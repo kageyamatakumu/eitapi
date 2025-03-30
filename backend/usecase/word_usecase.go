@@ -8,6 +8,7 @@ import (
 
 type IWordCase interface {
 	GetAllWordsForWordBook(wordBookID uint) ([]model.Word, error)
+	GetWordById(wordId uint) (model.WordRes, error)
 	CreateWord(word model.Word) (model.WordRes, error)
 	UpdateWord(word model.Word, wordId uint) (model.WordRes, error)
 }
@@ -29,6 +30,25 @@ func (wu *wordUseCase) GetAllWordsForWordBook(wordBookID uint) ([]model.Word, er
 	}
 
 	return words, nil
+}
+
+// 英単語を取得
+func (wu *wordUseCase) GetWordById(wordId uint) (model.WordRes, error) {
+	var word model.Word
+	if err := wu.wr.GetWordById(wordId, &word); err != nil {
+		return model.WordRes{}, err
+	}
+
+	wordRes := model.WordRes{
+		ID:                  word.ID,
+		EnglishWord:         word.EnglishWord,
+		JapaneseTranslation: word.JapaneseTranslation,
+		Pronunciation:       word.Pronunciation,
+		ExampleSentence:     word.ExampleSentence,
+		WordBookId:          word.WordBookId,
+	}
+
+	return wordRes, nil
 }
 
 // 英単語を新規作成
