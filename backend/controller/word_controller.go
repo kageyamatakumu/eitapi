@@ -14,6 +14,7 @@ type IWordController interface {
 	GetWordById(c echo.Context) error
 	CreateWord(c echo.Context) error
 	UpdateWord(c echo.Context) error
+	DeleteWord(c echo.Context) error
 }
 
 type wordController struct {
@@ -91,4 +92,28 @@ func (wc *wordController) UpdateWord(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, wordRes)
+}
+
+// 英単語を削除
+func (wc *wordController) DeleteWord(c echo.Context) error {
+	id := c.Param("wordId");
+	wordIdInt, err := strconv.Atoi(id)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, "wordId must be an integer")
+	}
+
+	if wordIdInt < 0 {
+		return c.JSON(http.StatusBadRequest, "wordId must be a positive integer")
+	}
+
+	wordUint := uint(wordIdInt)
+
+	if err := wc.wu.DeleteWord(wordUint); err != nil {
+		if err.Error() == "object does not exist" {
+			return c.JSON(http.StatusNotFound, "word not found")
+		}
+		return c.JSON(http.StatusInternalServerError, "failed to delete word")
+	}
+
+	return c.NoContent(http.StatusNoContent)
 }
