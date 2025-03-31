@@ -6,8 +6,8 @@ import (
 	"log"
 )
 
-type IWordCase interface {
-	GetAllWordsForWordBook(wordBookID uint) ([]model.Word, error)
+type IWordUsecase interface {
+	GetAllWordsForWordBook(wordBookId uint) ([]model.Word, error)
 	GetWordById(wordId uint) (model.WordRes, error)
 	CreateWord(word model.Word) (model.WordRes, error)
 	UpdateWord(word model.Word, wordId uint) (model.WordRes, error)
@@ -18,15 +18,14 @@ type wordUseCase struct {
 	wr repository.IWordRepository
 }
 
-func NewWordUsecase(wr repository.IWordRepository) IWordCase {
+func NewWordUsecase(wr repository.IWordRepository) IWordUsecase {
 	return &wordUseCase{wr}
 }
 
 // 英単語帳に紐づく英単語を全て取得
-func (wu *wordUseCase) GetAllWordsForWordBook(wordBookID uint) ([]model.Word, error) {
+func (wu *wordUseCase) GetAllWordsForWordBook(wordBookId uint) ([]model.Word, error) {
 	var words []model.Word
-	if err := wu.wr.GetAllWordsForWordBook(wordBookID, &words); err != nil {
-		log.Printf("failed to get all words for word book: %v", err)
+	if err := wu.wr.GetAllWordsForWordBook(wordBookId, &words); err != nil {
 		return nil, err
 	}
 
