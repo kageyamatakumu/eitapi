@@ -15,6 +15,7 @@ type IWordRepository interface {
 	GetWordById(wordID uint, word *model.Word) error
 	CreateWord(word *model.Word) error
 	UpdateWord(word *model.Word, wordId uint) error
+	DeleteWord(wordId uint) error
 }
 
 type wordRepository struct {
@@ -73,6 +74,24 @@ func (wr *wordRepository) UpdateWord(word *model.Word, wordId uint) error {
 		log.Printf("failed to update word: %v", result.Error)
 		return fmt.Errorf("object does not exist")
 	}
+
+	return nil
+}
+
+// 英単語を削除
+func (wr *wordRepository) DeleteWord(wordId uint) error {
+	result := wr.db.Where("id = ?", wordId).Delete(&model.Word{})
+	if result.Error != nil {
+		log.Printf("failed to delete word with id %d: %v", wordId, result.Error)
+		return result.Error
+	}
+
+	if result.RowsAffected < 1 {
+		log.Printf("word with id %d not found", wordId)
+		return fmt.Errorf("object does not exist")
+	}
+
+	log.Printf("success to delete word with id %d", wordId)
 
 	return nil
 }

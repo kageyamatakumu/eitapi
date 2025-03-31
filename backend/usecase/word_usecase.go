@@ -11,6 +11,7 @@ type IWordCase interface {
 	GetWordById(wordId uint) (model.WordRes, error)
 	CreateWord(word model.Word) (model.WordRes, error)
 	UpdateWord(word model.Word, wordId uint) (model.WordRes, error)
+	DeleteWord(wordId uint) error
 }
 
 type wordUseCase struct {
@@ -86,4 +87,13 @@ func (wu *wordUseCase) UpdateWord(word model.Word, wordId uint) (model.WordRes, 
 	}
 
 	return resWord, nil
+}
+
+// 英単語を削除
+func (wu *wordUseCase) DeleteWord(wordId uint) error {
+	if err := wu.wr.DeleteWord(wordId); err != nil {
+		return err
+	}
+
+	return nil
 }

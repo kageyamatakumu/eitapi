@@ -32,6 +32,7 @@ func NewRouter(ac controller.IAdminController, wbc controller.IWordBookControlle
 	wb.GET("/:wordBookID/words/:wordID", wc.GetWordById)
 	wb.POST("/:wordBookID/words", wc.CreateWord)
 	wb.PUT("/:wordBookID/words/:wordID", wc.UpdateWord)
+	wb.DELETE("/:wordBookID/words/:wordId", wc.DeleteWord)
 
 	return e
 }
