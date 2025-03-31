@@ -30,11 +30,11 @@ func NewRouter(ac controller.IAdminController, wbc controller.IWordBookControlle
 	wb.POST("/", wbc.CreateWordBook)
 	wb.DELETE("/:wordBookId", wbc.DeleteWordBook)
 	// 英単語
-	wb.GET("/:wordBookID/words", wc.GetAllWordsForWordBook)
-	wb.GET("/:wordBookID/words/:wordID", wc.GetWordById)
-	wb.POST("/:wordBookID/words", wc.CreateWord)
-	wb.PUT("/:wordBookID/words/:wordID", wc.UpdateWord)
-	wb.DELETE("/:wordBookID/words/:wordId", wc.DeleteWord)
+	wb.GET("/:wordBookId/words", wc.GetAllWordsForWordBook)
+	wb.GET("/:wordBookId/words/:wordId", wc.GetWordById)
+	wb.POST("/:wordBookId/words", wc.CreateWord)
+	wb.PUT("/:wordBookId/words/:wordId", wc.UpdateWord)
+	wb.DELETE("/:wordBookId/words/:wordId", wc.DeleteWord)
 
 	return e
 }

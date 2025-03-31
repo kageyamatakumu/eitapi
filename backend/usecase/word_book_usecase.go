@@ -3,37 +3,34 @@ package usecase
 import (
 	"backend/model"
 	"backend/repository"
-	"log"
 )
 
-type ITWordBookCase interface {
+type ITWordBookUsecase interface {
 	GetAllWordBook() ([]model.WordBook, error)
 	CreateWordBook(model.WordBook) (model.WordBookResponse, error)
 	DeleteWordBook(wordBookId uint) error
 }
 
-type wordBookUseCase struct {
+type wordBookUsecase struct {
 	wr repository.IWordBookRepository
 }
 
-func NewWordBookUsecase(wr repository.IWordBookRepository) ITWordBookCase {
-	return &wordBookUseCase{wr}
+func NewWordBookUsecase(wr repository.IWordBookRepository) ITWordBookUsecase {
+	return &wordBookUsecase{wr}
 }
 
 // 英単語帳を全て取得
-func (wu *wordBookUseCase) GetAllWordBook() ([]model.WordBook, error) {
+func (wu *wordBookUsecase) GetAllWordBook() ([]model.WordBook, error) {
 	var wordBooks []model.WordBook
 	if err := wu.wr.GetAllWordBook(&wordBooks); err != nil {
-		log.Printf("failed to get all word books: %v", err)
 		return nil, err
 	}
 	return wordBooks, nil
 }
 
 // 英単語帳を新規作成
-func (wu *wordBookUseCase) CreateWordBook(wordBook model.WordBook) (model.WordBookResponse, error) {
+func (wu *wordBookUsecase) CreateWordBook(wordBook model.WordBook) (model.WordBookResponse, error) {
 	if err := wu.wr.CreateWordBook(&wordBook); err != nil {
-		log.Printf("failed to create word book: %v", err)
 		return model.WordBookResponse{}, err
 	}
 
@@ -52,7 +49,7 @@ func (wu *wordBookUseCase) CreateWordBook(wordBook model.WordBook) (model.WordBo
 }
 
 // 英単語帳を削除
-func (wu *wordBookUseCase) DeleteWordBook(wordBookId uint) error {
+func (wu *wordBookUsecase) DeleteWordBook(wordBookId uint) error {
 	if err := wu.wr.DeleteWordBook(wordBookId); err != nil {
 		return err
 	}

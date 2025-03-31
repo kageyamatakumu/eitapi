@@ -17,10 +17,10 @@ type IWordBookController interface {
 }
 
 type wordBookController struct {
-	wu usecase.ITWordBookCase
+	wu usecase.ITWordBookUsecase
 }
 
-func NewWordBookController(wu usecase.ITWordBookCase) IWordBookController {
+func NewWordBookController(wu usecase.ITWordBookUsecase) IWordBookController {
 	return &wordBookController{wu}
 }
 

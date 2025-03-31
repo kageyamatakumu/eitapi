@@ -34,9 +34,11 @@ func (wr *wordBookRepository) GetAllWordBook(wordBooks *[]model.WordBook) error 
 // 英単語帳を新規作成
 func (wr *wordBookRepository) CreateWordBook(wordBook *model.WordBook) error {
 	if err := wr.db.Create(wordBook).Error; err != nil {
-		log.Printf("failed to create word book: %v", err)
+		log.Printf("failed to create word book: %v\n", err)
 		return err
 	}
+
+	log.Printf("successfully created word book\n")
 
 	return nil
 }
@@ -45,16 +47,16 @@ func (wr *wordBookRepository) CreateWordBook(wordBook *model.WordBook) error {
 func (wr *wordBookRepository) DeleteWordBook(wordBookId uint) error {
 	result := wr.db.Where("id = ?", wordBookId).Delete(&model.WordBook{})
 	if result.Error != nil {
-		log.Printf("failed to delete word book with id %d: %v", wordBookId, result.Error)
+		log.Printf("failed to delete word book with id %d: %v\n", wordBookId, result.Error)
 		return result.Error
 	}
 
 	if result.RowsAffected < 1 {
-		log.Printf("word book id %d not found", wordBookId)
+		log.Printf("word book id %d not found\n", wordBookId)
 		return fmt.Errorf("object does not exist")
 	}
 
-	log.Printf("success to delete word book with id %d", wordBookId)
+	log.Printf("successfully deleted word book with id %d\n", wordBookId)
 
 	return nil
 }
