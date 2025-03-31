@@ -9,6 +9,7 @@ import (
 type ITWordBookCase interface {
 	GetAllWordBook() ([]model.WordBook, error)
 	CreateWordBook(model.WordBook) (model.WordBookResponse, error)
+	DeleteWordBook(wordBookId uint) error
 }
 
 type wordBookUseCase struct {
@@ -48,4 +49,13 @@ func (wu *wordBookUseCase) CreateWordBook(wordBook model.WordBook) (model.WordBo
 	}
 
 	return resWordBook, nil
+}
+
+// 英単語帳を削除
+func (wu *wordBookUseCase) DeleteWordBook(wordBookId uint) error {
+	if err := wu.wr.DeleteWordBook(wordBookId); err != nil {
+		return err
+	}
+
+	return nil
 }

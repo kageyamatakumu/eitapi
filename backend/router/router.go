@@ -24,10 +24,12 @@ func NewRouter(ac controller.IAdminController, wbc controller.IWordBookControlle
 	a.POST("/", ac.CreateAdmin)
 	a.POST("/login", ac.LoginAdmin)
 
-	// 英単語
+	// 英単語帳
 	wb := api.Group("/word-books")
 	wb.GET("/", wbc.GetAllWordBooks)
 	wb.POST("/", wbc.CreateWordBook)
+	wb.DELETE("/:wordBookId", wbc.DeleteWordBook)
+	// 英単語
 	wb.GET("/:wordBookID/words", wc.GetAllWordsForWordBook)
 	wb.GET("/:wordBookID/words/:wordID", wc.GetWordById)
 	wb.POST("/:wordBookID/words", wc.CreateWord)

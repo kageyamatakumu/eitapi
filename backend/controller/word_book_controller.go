@@ -4,6 +4,7 @@ import (
 	"backend/model"
 	"backend/usecase"
 	"net/http"
+	"strconv"
 
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/labstack/echo/v4"
@@ -12,6 +13,7 @@ import (
 type IWordBookController interface {
 	GetAllWordBooks(c echo.Context) error
 	CreateWordBook(c echo.Context) error
+	DeleteWordBook(c echo.Context) error
 }
 
 type wordBookController struct {
@@ -49,4 +51,28 @@ func (wc *wordBookController) CreateWordBook(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusCreated, wordBookRes)
+}
+
+// 英単語帳を削除
+func (wc *wordBookController) DeleteWordBook(c echo.Context) error {
+	id := c.Param("wordBookId")
+	wordBookId, err := strconv.Atoi(id)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, "word book id must be an integer")
+	}
+
+	if wordBookId < 0 {
+		return c.JSON(http.StatusBadRequest, "word book id must be a positive integer")
+	}
+
+	wordBookIdUint := uint(wordBookId)
+
+	if err := wc.wu.DeleteWordBook(wordBookIdUint); err != nil {
+		if err.Error() == "object does not exist" {
+			return c.JSON(http.StatusNotFound, "word book not found")
+		}
+		return c.JSON(http.StatusInternalServerError, "failed to delete word book")
+	}
+
+	return c.NoContent(http.StatusNoContent)
 }
