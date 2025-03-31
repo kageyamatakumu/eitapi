@@ -13,7 +13,7 @@ type Word struct {
 	UpdatedAt           time.Time `json:"updated_at" gorm:"autoUpdateTime"`
 
 	// Association
-	WordBook WordBook `json:"word_book"`
+	WordBook WordBook `json:"word_book" gorm:"foreignKey:WordBookId; constraint:OnDelete:CASCADE;"`
 }
 
 type WordRes struct {

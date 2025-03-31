@@ -2,6 +2,7 @@ package repository
 
 import (
 	"backend/model"
+	"fmt"
 	"log"
 
 	"gorm.io/gorm"
@@ -10,6 +11,7 @@ import (
 type IWordBookRepository interface {
 	GetAllWordBook(wordBooks *[]model.WordBook) error
 	CreateWordBook(wordBook *model.WordBook) error
+	DeleteWordBook(wordBookId uint) error
 }
 
 type wordBookRepository struct {
@@ -35,6 +37,24 @@ func (wr *wordBookRepository) CreateWordBook(wordBook *model.WordBook) error {
 		log.Printf("failed to create word book: %v", err)
 		return err
 	}
+
+	return nil
+}
+
+// 英単語帳を削除
+func (wr *wordBookRepository) DeleteWordBook(wordBookId uint) error {
+	result := wr.db.Where("id = ?", wordBookId).Delete(&model.WordBook{})
+	if result.Error != nil {
+		log.Printf("failed to delete word book with id %d: %v", wordBookId, result.Error)
+		return result.Error
+	}
+
+	if result.RowsAffected < 1 {
+		log.Printf("word book id %d not found", wordBookId)
+		return fmt.Errorf("object does not exist")
+	}
+
+	log.Printf("success to delete word book with id %d", wordBookId)
 
 	return nil
 }
