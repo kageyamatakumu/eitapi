@@ -59,10 +59,24 @@ func (wc *wordController) GetWordById(c echo.Context) error {
 
 // 英単語を新規作成
 func (wc *wordController) CreateWord(c echo.Context) error {
+	id := c.Param("wordBookId")
+	wordBookIdInt, err := strconv.Atoi(id)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, "invalid word book id")
+	}
+
+	if wordBookIdInt < 0 {
+		return c.JSON(http.StatusBadRequest, "word book id must be a positive integer")
+	}
+
+	wordBookIdUint := uint(wordBookIdInt)
+
 	word := model.Word{}
 	if err := c.Bind(&word); err != nil {
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
+
+	word.WordBookId = wordBookIdUint
 
 	wordRes, err := wc.wu.CreateWord(word)
 	if err != nil {
