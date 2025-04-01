@@ -3,13 +3,12 @@ package usecase
 import (
 	"backend/model"
 	"backend/repository"
-	"log"
 )
 
 type IWordUsecase interface {
 	GetAllWordsForWordBook(wordBookId uint) ([]model.Word, error)
 	GetWordById(wordId uint) (model.WordRes, error)
-	CreateWord(word model.Word) (model.WordRes, error)
+	CreateMultipleWords(words []model.Word) ([]model.WordRes, error)
 	UpdateWord(word model.Word, wordId uint) (model.WordRes, error)
 	DeleteWord(wordId uint) error
 }
@@ -52,22 +51,25 @@ func (wu *wordUseCase) GetWordById(wordId uint) (model.WordRes, error) {
 }
 
 // 英単語を新規作成
-func (wu *wordUseCase) CreateWord(word model.Word) (model.WordRes, error) {
-	if err := wu.wr.CreateWord(&word); err != nil {
-		log.Printf("failed to create word: %v", err)
-		return model.WordRes{}, err
+func (wu *wordUseCase) CreateMultipleWords(words []model.Word) ([]model.WordRes, error) {
+	if err := wu.wr.CreateMultipleWords(&words); err != nil {
+		return []model.WordRes{}, err
 	}
 
-	resWord := model.WordRes{
-		ID:                  word.ID,
-		EnglishWord:         word.EnglishWord,
-		JapaneseTranslation: word.JapaneseTranslation,
-		Pronunciation:       word.Pronunciation,
-		ExampleSentence:     word.ExampleSentence,
-		WordBookId:          word.WordBookId,
+	multipleWords := make([]model.WordRes, len(words))
+
+	for i, v := range words {
+		multipleWords[i] = model.WordRes{
+			ID:                  v.ID,
+			EnglishWord:         v.EnglishWord,
+			JapaneseTranslation: v.JapaneseTranslation,
+			Pronunciation:       v.Pronunciation,
+			ExampleSentence:     v.ExampleSentence,
+			WordBookId:          v.WordBookId,
+		}
 	}
 
-	return resWord, nil
+	return multipleWords, nil
 }
 
 // 英単語を更新する

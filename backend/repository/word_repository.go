@@ -13,7 +13,7 @@ import (
 type IWordRepository interface {
 	GetAllWordsForWordBook(wordBookId uint, words *[]model.Word) error
 	GetWordById(wordId uint, word *model.Word) error
-	CreateWord(word *model.Word) error
+	CreateMultipleWords(words *[]model.Word) error
 	UpdateWord(word *model.Word, wordId uint) error
 	DeleteWord(wordId uint) error
 }
@@ -46,9 +46,9 @@ func (wr *wordRepository) GetWordById(wordId uint, word *model.Word) error {
 }
 
 // 英単語を新規作成
-func (wr *wordRepository) CreateWord(word *model.Word) error {
-	if err := wr.db.Create(word).Error; err != nil {
-		log.Printf("failed to create word: %v\n", err)
+func (wr *wordRepository) CreateMultipleWords(words *[]model.Word) error {
+	if err := wr.db.Create(words).Error; err != nil {
+		log.Printf("failed to create words: %v\n", err)
 		return err
 	}
 

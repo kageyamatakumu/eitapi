@@ -32,7 +32,7 @@ func NewRouter(ac controller.IAdminController, wbc controller.IWordBookControlle
 	// 英単語
 	wb.GET("/:wordBookId/words", wc.GetAllWordsForWordBook)
 	wb.GET("/:wordBookId/words/:wordId", wc.GetWordById)
-	wb.POST("/:wordBookId/words", wc.CreateWord)
+	wb.POST("/:wordBookId/words", wc.CreateMultipleWords)
 	wb.PUT("/:wordBookId/words/:wordId", wc.UpdateWord)
 	wb.DELETE("/:wordBookId/words/:wordId", wc.DeleteWord)
 
