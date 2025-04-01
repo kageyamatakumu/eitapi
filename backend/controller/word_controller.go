@@ -12,7 +12,7 @@ import (
 type IWordController interface {
 	GetAllWordsForWordBook(c echo.Context) error
 	GetWordById(c echo.Context) error
-	CreateWord(c echo.Context) error
+	CreateMultipleWords(c echo.Context) error
 	UpdateWord(c echo.Context) error
 	DeleteWord(c echo.Context) error
 }
@@ -58,18 +58,34 @@ func (wc *wordController) GetWordById(c echo.Context) error {
 }
 
 // 英単語を新規作成
-func (wc *wordController) CreateWord(c echo.Context) error {
-	word := model.Word{}
-	if err := c.Bind(&word); err != nil {
+func (wc *wordController) CreateMultipleWords(c echo.Context) error {
+	id := c.Param("wordBookId")
+	wordBookIdInt, err := strconv.Atoi(id)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, "invalid word book id")
+	}
+
+	if wordBookIdInt < 0 {
+		return c.JSON(http.StatusBadRequest, "word book id must be a positive integer")
+	}
+
+	wordBookIdUint := uint(wordBookIdInt)
+
+	var words []model.Word
+	if err := c.Bind(&words); err != nil {
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 
-	wordRes, err := wc.wu.CreateWord(word)
+	for i := range words {
+		words[i].WordBookId = wordBookIdUint
+	}
+
+	wordsRes, err := wc.wu.CreateMultipleWords(words)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 
-	return c.JSON(http.StatusCreated, wordRes)
+	return c.JSON(http.StatusCreated, wordsRes)
 }
 
 // 英単語を更新
