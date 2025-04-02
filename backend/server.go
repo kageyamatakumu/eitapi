@@ -13,11 +13,12 @@ func main() {
 
 	dbConn := db.CreateDB()
 	adminValidator := validator.NewAdminValidator()
+	wordBookValidator := validator.NewWordBookValidator()
 	adminRepository := repository.NewAdminRepository(dbConn)
 	wordBookRepository := repository.NewWordBookRepository(dbConn)
 	wordRepository := repository.NewWordRepository(dbConn)
 	adminUsecase := usecase.NewAdminUsecase(adminRepository, adminValidator)
-	wordBookUseCase := usecase.NewWordBookUsecase(wordBookRepository)
+	wordBookUseCase := usecase.NewWordBookUsecase(wordBookRepository, wordBookValidator)
 	wordUseCase := usecase.NewWordUsecase(wordRepository)
 	adminController := controller.NewAdminController(adminUsecase)
 	wordBookController := controller.NewWordBookController(wordBookUseCase)
