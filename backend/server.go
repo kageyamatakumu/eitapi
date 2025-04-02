@@ -6,15 +6,17 @@ import (
 	"backend/repository"
 	"backend/router"
 	"backend/usecase"
+	"backend/validator"
 )
 
 func main() {
 
 	dbConn := db.CreateDB()
+	adminValidator := validator.NewAdminValidator()
 	adminRepository := repository.NewAdminRepository(dbConn)
 	wordBookRepository := repository.NewWordBookRepository(dbConn)
 	wordRepository := repository.NewWordRepository(dbConn)
-	adminUsecase := usecase.NewAdminUsecase(adminRepository)
+	adminUsecase := usecase.NewAdminUsecase(adminRepository, adminValidator)
 	wordBookUseCase := usecase.NewWordBookUsecase(wordBookRepository)
 	wordUseCase := usecase.NewWordUsecase(wordRepository)
 	adminController := controller.NewAdminController(adminUsecase)
