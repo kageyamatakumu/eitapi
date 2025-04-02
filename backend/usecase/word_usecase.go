@@ -3,6 +3,7 @@ package usecase
 import (
 	"backend/model"
 	"backend/repository"
+	"backend/validator"
 )
 
 type IWordUsecase interface {
@@ -15,10 +16,25 @@ type IWordUsecase interface {
 
 type wordUseCase struct {
 	wr repository.IWordRepository
+	wv validator.IWordValidator
 }
 
-func NewWordUsecase(wr repository.IWordRepository) IWordUsecase {
-	return &wordUseCase{wr}
+func NewWordUsecase(wr repository.IWordRepository, wv validator.IWordValidator) IWordUsecase {
+	return &wordUseCase{wr, wv}
+}
+
+// 単語のバリデーション
+func (wu *wordUseCase) validateWord(word model.Word) error {
+	if err := wu.wv.ValidateEnglishWord(word.EnglishWord); err != nil {
+		return err
+	}
+	if err := wu.wv.ValidateJapaneseTranslation(word.JapaneseTranslation); err != nil {
+		return err
+	}
+	if err := wu.wv.ValidatePronunciation(word.Pronunciation); err != nil {
+		return err
+	}
+	return nil
 }
 
 // 英単語帳に紐づく英単語を全て取得
@@ -52,6 +68,13 @@ func (wu *wordUseCase) GetWordById(wordId uint) (model.WordRes, error) {
 
 // 英単語を新規作成
 func (wu *wordUseCase) CreateMultipleWords(words []model.Word) ([]model.WordRes, error) {
+
+	for _, word := range words {
+		if err := wu.validateWord(word); err != nil {
+			return []model.WordRes{}, err
+		}
+	}
+
 	if err := wu.wr.CreateMultipleWords(&words); err != nil {
 		return []model.WordRes{}, err
 	}
@@ -74,6 +97,10 @@ func (wu *wordUseCase) CreateMultipleWords(words []model.Word) ([]model.WordRes,
 
 // 英単語を更新する
 func (wu *wordUseCase) UpdateWord(word model.Word, wordId uint) (model.WordRes, error) {
+	if err := wu.validateWord(word); err != nil {
+		return model.WordRes{}, err
+	}
+
 	if err := wu.wr.UpdateWord(&word, wordId); err != nil {
 		return model.WordRes{}, err
 	}
