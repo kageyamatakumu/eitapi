@@ -3,6 +3,7 @@ package usecase
 import (
 	"backend/model"
 	"backend/repository"
+	"backend/validator"
 	"os"
 	"time"
 
@@ -17,14 +18,23 @@ type IAdminUsecase interface {
 
 type adminUsecase struct {
 	ar repository.IAdminRepository
+	av validator.IAdminValidator
 }
 
-func NewAdminUsecase(ar repository.IAdminRepository) IAdminUsecase {
-	return &adminUsecase{ar}
+func NewAdminUsecase(ar repository.IAdminRepository, av validator.IAdminValidator) IAdminUsecase {
+	return &adminUsecase{ar, av}
 }
 
 // 管理者を新規作成
 func (au *adminUsecase) CreateAdmin(admin model.Admin) (model.Admin, error) {
+	if err := au.av.ValidateEmail(admin.Email); err != nil {
+		return model.Admin{}, err
+	}
+
+	if err := au.av.ValidatePassword(admin.Password); err != nil {
+		return model.Admin{}, err
+	}
+
 	hash, err := bcrypt.GenerateFromPassword([]byte(admin.Password), 10)
 	if err != nil {
 		return model.Admin{}, err
