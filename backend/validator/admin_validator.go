@@ -18,7 +18,7 @@ func NewAdminValidator() IAdminValidator {
 }
 
 // メールアドレス
-func (av *adminValidator)ValidateEmail(email string) error {
+func (av *adminValidator) ValidateEmail(email string) error {
 	if email == "" {
 		return fmt.Errorf("メールアドレスを入力してください")
 	}
@@ -40,7 +40,7 @@ func (av *adminValidator)ValidateEmail(email string) error {
 }
 
 // パスワード
-func (av *adminValidator)ValidatePassword(password string) error {
+func (av *adminValidator) ValidatePassword(password string) error {
 	if password == "" {
 		return fmt.Errorf("パスワードを入力してください")
 	}

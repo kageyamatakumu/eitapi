@@ -3,6 +3,7 @@ package usecase
 import (
 	"backend/model"
 	"backend/repository"
+	"backend/validator"
 )
 
 type ITWordBookUsecase interface {
@@ -12,11 +13,12 @@ type ITWordBookUsecase interface {
 }
 
 type wordBookUsecase struct {
-	wr repository.IWordBookRepository
+	wr  repository.IWordBookRepository
+	wbv validator.IWordBookValidator
 }
 
-func NewWordBookUsecase(wr repository.IWordBookRepository) ITWordBookUsecase {
-	return &wordBookUsecase{wr}
+func NewWordBookUsecase(wr repository.IWordBookRepository, wbv validator.IWordBookValidator) ITWordBookUsecase {
+	return &wordBookUsecase{wr, wbv}
 }
 
 // 英単語帳を全て取得
@@ -30,6 +32,10 @@ func (wu *wordBookUsecase) GetAllWordBook() ([]model.WordBook, error) {
 
 // 英単語帳を新規作成
 func (wu *wordBookUsecase) CreateWordBook(wordBook model.WordBook) (model.WordBookResponse, error) {
+	if err := wu.wbv.ValidateTitle(wordBook.Title); err != nil {
+		return model.WordBookResponse{}, err
+	}
+
 	if err := wu.wr.CreateWordBook(&wordBook); err != nil {
 		return model.WordBookResponse{}, err
 	}
