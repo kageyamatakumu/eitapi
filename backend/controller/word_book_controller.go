@@ -11,6 +11,7 @@ import (
 )
 
 type IWordBookController interface {
+	GetAllWordBooksPublic(c echo.Context) error
 	GetAllWordBooks(c echo.Context) error
 	CreateWordBook(c echo.Context) error
 	DeleteWordBook(c echo.Context) error
@@ -23,6 +24,19 @@ type wordBookController struct {
 func NewWordBookController(wu usecase.ITWordBookUsecase) IWordBookController {
 	return &wordBookController{wu}
 }
+
+// 公開エンドポイント（認証不要）
+
+// 英単語帳を全て取得(非認証)
+func (wc *wordBookController) GetAllWordBooksPublic(c echo.Context) error {
+	wordBooks, err := wc.wu.GetAllWordBook()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusOK, wordBooks)
+}
+
+// 認証が必要なエンドポイント
 
 // 英単語帳を全て取得
 func (wc *wordBookController) GetAllWordBooks(c echo.Context) error {

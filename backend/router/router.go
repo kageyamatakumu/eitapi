@@ -24,36 +24,53 @@ func NewRouter(cc controller.ICsrfTokenController, ac controller.IAdminControlle
 		CookiePath:     "/",
 		CookieDomain:   os.Getenv("API_DOMAIN"),
 		CookieHTTPOnly: true,
-		// CookieSameSite: http.SameSiteNoneMode,
-		CookieSameSite: http.SameSiteDefaultMode,
+		CookieSameSite: http.SameSiteNoneMode,
+		// CookieSameSite: http.SameSiteDefaultMode,
 	}))
 
 	v1 := e.Group("/api/v1")
 
 	v1.GET("/csrf", cc.CsrfToken)
 
-	api := v1.Group("")
-	api.Use(echojwt.WithConfig(echojwt.Config{
+	// 非認証エンドポイント
+	unauthorized := v1.Group("/unauthorized")
+
+	// 管理者用(非認証)
+	unauthorizedAdmin := unauthorized.Group("/admins")
+	unauthorizedAdmin.POST("/login", ac.LoginAdmin)
+
+	// 英単語帳(非認証)
+	unauthorizedWordBook := unauthorized.Group("/word-books")
+	unauthorizedWordBook.GET("/", wbc.GetAllWordBooksPublic)
+
+	// 英単語(非認証)
+	unauthorizedWord := unauthorizedWordBook.Group("/:wordBookId/words")
+	unauthorizedWord.GET("/:id", wc.GetAllWordsForWordBookPublic)
+
+	// 認証が必要なエンドポイント
+	authorizedApi := v1.Group("/authorized")
+	authorizedApi.Use(echojwt.WithConfig(echojwt.Config{
 		SigningKey:  []byte(os.Getenv("SECRET")),
 		TokenLookup: "cookie:token",
 	}))
 
-	// 管理者
-	a := v1.Group("/admins")
-	a.POST("/", ac.CreateAdmin)
-	a.POST("/login", ac.LoginAdmin)
+	// 管理者用エンドポイント
+	authorizedAdmin := authorizedApi.Group("/admins")
+	authorizedAdmin.POST("/", ac.CreateAdmin)
 
-	// 英単語帳
-	wb := api.Group("/word-books")
-	wb.GET("/", wbc.GetAllWordBooks)
-	wb.POST("/", wbc.CreateWordBook)
-	wb.DELETE("/:wordBookId", wbc.DeleteWordBook)
-	// 英単語
-	wb.GET("/:wordBookId/words", wc.GetAllWordsForWordBook)
-	wb.GET("/:wordBookId/words/:wordId", wc.GetWordById)
-	wb.POST("/:wordBookId/words", wc.CreateMultipleWords)
-	wb.PUT("/:wordBookId/words/:wordId", wc.UpdateWord)
-	wb.DELETE("/:wordBookId/words/:wordId", wc.DeleteWord)
+	// 管理者用 英単語帳エンドポイント
+	authorizedAdminWordBook := authorizedAdmin.Group("/word-books")
+	authorizedAdminWordBook.GET("/", wbc.GetAllWordBooks)
+	authorizedAdminWordBook.POST("/", wbc.CreateWordBook)
+	authorizedAdminWordBook.DELETE("/:wordBookId", wbc.DeleteWordBook)
+
+	// 管理者用 英単語エンドポイント
+	authorizedAdminWord := authorizedAdminWordBook.Group("/:wordBookId/words")
+	authorizedAdminWord.GET("/", wc.GetAllWordsForWordBook)
+	authorizedAdminWord.GET("/:id", wc.GetWordById)
+	authorizedAdminWord.POST("/", wc.CreateMultipleWords)
+	authorizedAdminWord.PUT("/:id", wc.UpdateWord)
+	authorizedAdminWord.DELETE("/:id", wc.DeleteWord)
 
 	return e
 }
