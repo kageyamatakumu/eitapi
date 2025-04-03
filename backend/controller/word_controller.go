@@ -10,6 +10,7 @@ import (
 )
 
 type IWordController interface {
+	GetAllWordsForWordBookPublic(c echo.Context) error
 	GetAllWordsForWordBook(c echo.Context) error
 	GetWordById(c echo.Context) error
 	CreateMultipleWords(c echo.Context) error
@@ -24,6 +25,26 @@ type wordController struct {
 func NewWordController(wu usecase.IWordUsecase) IWordController {
 	return &wordController{wu}
 }
+
+// 公開エンドポイント（認証不要）
+
+// 英単語帳に紐づく英単語を全て取得(非認証)
+func (wc *wordController) GetAllWordsForWordBookPublic(c echo.Context) error {
+	id := c.Param("wordBookId")
+	wordBookIdInt, err := strconv.Atoi(id)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, "invalid word Book id")
+	}
+	wordBookIdUint := uint(wordBookIdInt)
+
+	words, err := wc.wu.GetAllWordsForWordBook(wordBookIdUint)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusOK, words)
+}
+
+// 認証が必要なエンドポイント
 
 // 英単語帳に紐づく英単語を全て取得
 func (wc *wordController) GetAllWordsForWordBook(c echo.Context) error {
@@ -43,7 +64,7 @@ func (wc *wordController) GetAllWordsForWordBook(c echo.Context) error {
 
 // 英単語を取得
 func (wc *wordController) GetWordById(c echo.Context) error {
-	id := c.Param("wordId")
+	id := c.Param("id")
 	wordIdInt, err := strconv.Atoi(id)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, "invalid word id")
@@ -90,7 +111,7 @@ func (wc *wordController) CreateMultipleWords(c echo.Context) error {
 
 // 英単語を更新
 func (wc *wordController) UpdateWord(c echo.Context) error {
-	id := c.Param("wordId")
+	id := c.Param("id")
 	wordIdInt, err := strconv.Atoi(id)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, "invalid word Book id")
@@ -117,7 +138,7 @@ func (wc *wordController) UpdateWord(c echo.Context) error {
 
 // 英単語を削除
 func (wc *wordController) DeleteWord(c echo.Context) error {
-	id := c.Param("wordId")
+	id := c.Param("id")
 	wordIdInt, err := strconv.Atoi(id)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, "word id must be an integer")
