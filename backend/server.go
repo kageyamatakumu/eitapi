@@ -25,11 +25,12 @@ func main() {
 	wordBookUseCase := usecase.NewWordBookUsecase(wordBookRepository, wordBookValidator)
 	wordUseCase := usecase.NewWordUsecase(wordRepository, wordValidator)
 
+	csrfTokenController := controller.NewCsrfTokenController()
 	adminController := controller.NewAdminController(adminUsecase)
 	wordBookController := controller.NewWordBookController(wordBookUseCase)
 	wordController := controller.NewWordController(wordUseCase)
 
-	e := router.NewRouter(adminController, wordBookController, wordController)
+	e := router.NewRouter(csrfTokenController, adminController, wordBookController, wordController)
 
 	// サーバーをポート番号1323で起動
 	e.Logger.Fatal(e.Start(":1323"))

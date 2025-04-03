@@ -2,16 +2,35 @@ package router
 
 import (
 	"backend/controller"
+	"net/http"
 	"os"
 
 	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 )
 
-func NewRouter(ac controller.IAdminController, wbc controller.IWordBookController, wc controller.IWordController) *echo.Echo {
+func NewRouter(cc controller.ICsrfTokenController, ac controller.IAdminController, wbc controller.IWordBookController, wc controller.IWordController) *echo.Echo {
 	e := echo.New()
 
+	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins:     []string{"http://localhost:3000", os.Getenv("FE_URL")},
+		AllowHeaders:     []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderAccessControlAllowHeaders, echo.HeaderXCSRFToken},
+		AllowMethods:     []string{"GET", "PUT", "POST", "DELETE"},
+		AllowCredentials: true,
+	}))
+
+	e.Use(middleware.CSRFWithConfig(middleware.CSRFConfig{
+		CookiePath:     "/",
+		CookieDomain:   os.Getenv("API_DOMAIN"),
+		CookieHTTPOnly: true,
+		// CookieSameSite: http.SameSiteNoneMode,
+		CookieSameSite: http.SameSiteDefaultMode,
+	}))
+
 	v1 := e.Group("/api/v1")
+
+	v1.GET("/csrf", cc.CsrfToken)
 
 	api := v1.Group("")
 	api.Use(echojwt.WithConfig(echojwt.Config{
