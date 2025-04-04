@@ -10,7 +10,13 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 )
 
-func NewRouter(cc controller.ICsrfTokenController, ac controller.IAdminController, wbc controller.IWordBookController, wc controller.IWordController) *echo.Echo {
+func NewRouter(
+	cc controller.ICsrfTokenController,
+	ac controller.IAdminController,
+	wbc controller.IWordBookController,
+	wc controller.IWordController,
+	dc controller.IDifficultyController,
+) *echo.Echo {
 	e := echo.New()
 
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
@@ -71,6 +77,10 @@ func NewRouter(cc controller.ICsrfTokenController, ac controller.IAdminControlle
 	authorizedAdminWord.POST("/", wc.CreateMultipleWords)
 	authorizedAdminWord.PUT("/:id", wc.UpdateWord)
 	authorizedAdminWord.DELETE("/:id", wc.DeleteWord)
+
+	// 管理者用 難易度エンドポイント
+	authorizedAdminDifficulty := authorizedAdmin.Group("/difficulties")
+	authorizedAdminDifficulty.POST("/", dc.CreateDifficulty)
 
 	return e
 }
