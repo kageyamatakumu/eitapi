@@ -81,6 +81,7 @@ func NewRouter(
 	// 管理者用 難易度エンドポイント
 	authorizedAdminDifficulty := authorizedAdmin.Group("/difficulties")
 	authorizedAdminDifficulty.POST("/", dc.CreateDifficulty)
+	authorizedAdminDifficulty.PUT("/:id", dc.UpdateDifficulty)
 
 	return e
 }
