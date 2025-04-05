@@ -82,6 +82,7 @@ func NewRouter(
 	authorizedAdminDifficulty := authorizedAdmin.Group("/difficulties")
 	authorizedAdminDifficulty.POST("/", dc.CreateDifficulty)
 	authorizedAdminDifficulty.PUT("/:id", dc.UpdateDifficulty)
+	authorizedAdminDifficulty.DELETE("/:id", dc.DeleteDifficulty)
 
 	return e
 }
