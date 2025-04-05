@@ -12,6 +12,7 @@ import (
 type IDifficultyController interface {
 	CreateDifficulty(c echo.Context) error
 	UpdateDifficulty(c echo.Context) error
+	DeleteDifficulty(c echo.Context) error
 }
 
 type difficultyController struct {
@@ -62,4 +63,25 @@ func (dc *difficultyController) UpdateDifficulty(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, resDifficulty)
+}
+
+// 難易度を削除
+func (dc *difficultyController) DeleteDifficulty(c echo.Context) error {
+	id := c.Param("id")
+	difficultyIdInt, err := strconv.Atoi(id)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, "invalid difficulty id")
+	}
+
+	if difficultyIdInt < 0 {
+		return c.JSON(http.StatusBadRequest, "difficulty id must be a positive integer")
+	}
+
+	difficultyIdUint := uint(difficultyIdInt)
+
+	if err := dc.du.DeleteDifficulty(difficultyIdUint); err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.NoContent(http.StatusNoContent)
 }

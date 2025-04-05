@@ -8,6 +8,7 @@ import (
 type IDifficultyUsecase interface {
 	CreateDifficulty(difficulty model.Difficulty) (model.DifficultyResponse, error)
 	UpdateDifficulty(difficulty model.Difficulty, difficultyId uint) (model.DifficultyResponse, error)
+	DeleteDifficulty(difficultyId uint) error
 }
 
 type difficultyUsecase struct {
@@ -44,4 +45,13 @@ func (du *difficultyUsecase) UpdateDifficulty(difficulty model.Difficulty, diffi
 	}
 
 	return resDifficulty, nil
+}
+
+// 難易度を削除
+func (du *difficultyUsecase) DeleteDifficulty(difficultyId uint) error {
+	if err := du.dr.DeleteDifficulty(difficultyId); err != nil {
+		return err
+	}
+
+	return nil
 }

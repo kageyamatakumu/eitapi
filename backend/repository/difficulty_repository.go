@@ -11,6 +11,7 @@ import (
 type IDifficultyRepository interface {
 	CreateDifficulty(difficulty *model.Difficulty) error
 	UpdateDifficulty(difficulty *model.Difficulty, difficultyId uint) error
+	DeleteDifficulty(difficultyId uint) error
 }
 
 type difficultyRepository struct {
@@ -51,6 +52,24 @@ func (dr *difficultyRepository) UpdateDifficulty(difficulty *model.Difficulty, d
 	}
 
 	log.Printf("successfully updated difficulty with id %d\n", difficultyId)
+
+	return nil
+}
+
+// 難易度を削除
+func (dr *difficultyRepository) DeleteDifficulty(difficultyId uint) error {
+	result := dr.db.Where("id = ?", difficultyId).Delete(&model.Difficulty{})
+	if result.Error != nil {
+		log.Printf("failed to delete difficulty with id %d: %v", difficultyId, result.Error)
+		return result.Error
+	}
+
+	if result.RowsAffected < 1 {
+		log.Printf("difficulty with id %d not found", difficultyId)
+		return gorm.ErrRecordNotFound
+	}
+
+	log.Printf("successfully deleted difficulty with id %d\n", difficultyId)
 
 	return nil
 }
