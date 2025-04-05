@@ -7,6 +7,7 @@ import (
 
 type IDifficultyUsecase interface {
 	CreateDifficulty(difficulty model.Difficulty) (model.DifficultyResponse, error)
+	UpdateDifficulty(difficulty model.Difficulty, difficultyId uint) (model.DifficultyResponse, error)
 }
 
 type difficultyUsecase struct {
@@ -23,10 +24,24 @@ func (du *difficultyUsecase) CreateDifficulty(difficulty model.Difficulty) (mode
 		return model.DifficultyResponse{}, err
 	}
 
-	resIDifficulty := model.DifficultyResponse{
+	resDifficulty := model.DifficultyResponse{
 		ID:              difficulty.ID,
 		DifficultyLevel: difficulty.DifficultyLevel,
 	}
 
-	return resIDifficulty, nil
+	return resDifficulty, nil
+}
+
+// 難易度を更新
+func (du *difficultyUsecase) UpdateDifficulty(difficulty model.Difficulty, difficultyId uint) (model.DifficultyResponse, error) {
+	if err := du.dr.UpdateDifficulty(&difficulty, difficultyId); err != nil {
+		return model.DifficultyResponse{}, err
+	}
+
+	resDifficulty := model.DifficultyResponse{
+		ID:              difficulty.ID,
+		DifficultyLevel: difficulty.DifficultyLevel,
+	}
+
+	return resDifficulty, nil
 }
