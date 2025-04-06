@@ -9,6 +9,7 @@ import (
 )
 
 type IDifficultyRepository interface {
+	GetAllDifficulties(difficulties *[]model.Difficulty) error
 	CreateDifficulty(difficulty *model.Difficulty) error
 	UpdateDifficulty(difficulty *model.Difficulty, difficultyId uint) error
 	DeleteDifficulty(difficultyId uint) error
@@ -20,6 +21,16 @@ type difficultyRepository struct {
 
 func NewDifficultyRepository(db *gorm.DB) IDifficultyRepository {
 	return &difficultyRepository{db}
+}
+
+// 難易度を全て取得
+func (dr *difficultyRepository) GetAllDifficulties(difficulties *[]model.Difficulty) error {
+	if err := dr.db.Model(&model.Difficulty{}).Find(difficulties).Error; err != nil {
+		log.Printf("failed to get all difficulties: %v", err)
+		return err
+	}
+
+	return nil
 }
 
 // 難易度を作成
