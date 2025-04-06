@@ -8,3 +8,8 @@ type Genre struct {
 	CreatedAt time.Time `json:"created_at" gorm:"autoCreateTime"`
 	UpdatedAt time.Time `json:"updated_at" gorm:"autoUpdateTime"`
 }
+
+type GenreRes struct {
+	ID        uint   `json:"id"`
+	GenreName string `json:"genre_name"`
+}
