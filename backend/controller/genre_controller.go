@@ -12,6 +12,7 @@ import (
 type IGenreController interface {
 	CreateGenre(c echo.Context) error
 	UpdateGenre(c echo.Context) error
+	DeleteGenre(c echo.Context) error
 }
 
 type genreController struct {
@@ -63,4 +64,25 @@ func (gc *genreController) UpdateGenre(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, genreRes)
+}
+
+// ジャンル削除
+func (gc *genreController) DeleteGenre(c echo.Context) error {
+	id := c.Param("id")
+	genreIdInt, err := strconv.Atoi(id)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, "invalid genre id")
+	}
+
+	if genreIdInt < 0 {
+		return c.JSON(http.StatusBadRequest, "genre id must be a positive integer")
+	}
+
+	genreIdUint := uint(genreIdInt)
+
+	if err := gc.gu.DeleteGenre(genreIdUint); err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.NoContent(http.StatusNoContent)
 }

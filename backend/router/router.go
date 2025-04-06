@@ -94,6 +94,7 @@ func NewRouter(
 	authorizedAdminGenre := authorizedAdmin.Group("/genres")
 	authorizedAdminGenre.POST("/", gc.CreateGenre)
 	authorizedAdminGenre.PUT("/:id", gc.UpdateGenre)
+	authorizedAdminGenre.DELETE("/:id", gc.DeleteGenre)
 
 	return e
 }
