@@ -1,0 +1,40 @@
+services:
+  app:
+    container_name: eitapi-backend
+    build:
+      context: .
+      dockerfile: ./infra/Dockerfile.dev
+    volumes:
+      - .:/usr/src/app
+    ports:
+      - "1323:1323"
+    tty: true
+    env_file:
+      - .env
+    networks:
+      - app-network
+    depends_on:
+      - database
+  database:
+    container_name: eitapi-database
+    image: postgres:15.1-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DATABASE: ${POSTGRES_DATABASE}
+      POSTGRES_USER: ${POSTGRES_USER}
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+volumes:
+  postgres_data:
+networks:
+  app-network:

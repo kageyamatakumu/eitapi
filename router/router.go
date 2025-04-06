@@ -18,6 +18,7 @@ func NewRouter(
 	dc controller.IDifficultyController,
 	gc controller.IGenreController,
 ) *echo.Echo {
+
 	e := echo.New()
 
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
@@ -52,7 +53,7 @@ func NewRouter(
 
 	// 英単語(非認証)
 	unauthorizedWord := unauthorizedWordBook.Group("/:wordBookId/words")
-	unauthorizedWord.GET("/:id", wc.GetAllWordsForWordBookPublic)
+	unauthorizedWord.GET("/", wc.GetAllWordsForWordBookPublic)
 
 	// 難易度(非認証)
 	unauthorizedDifficulty := unauthorized.Group("/difficulties")
