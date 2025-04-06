@@ -53,6 +53,10 @@ func NewRouter(
 	unauthorizedWord := unauthorizedWordBook.Group("/:wordBookId/words")
 	unauthorizedWord.GET("/:id", wc.GetAllWordsForWordBookPublic)
 
+	// 難易度(非認証)
+	unauthorizedDifficulty := unauthorized.Group("/difficulties")
+	unauthorizedDifficulty.GET("/", dc.GetAllDifficultiesPublic)
+
 	// 認証が必要なエンドポイント
 	authorizedApi := v1.Group("/authorized")
 	authorizedApi.Use(echojwt.WithConfig(echojwt.Config{
