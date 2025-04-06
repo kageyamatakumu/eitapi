@@ -8,6 +8,7 @@ import (
 type IGenreUsecase interface {
 	CreateGenre(genre model.Genre) (model.GenreRes, error)
 	UpdateGenre(genre model.Genre, genreId uint) (model.GenreRes, error)
+	DeleteGenre(genreId uint) error
 }
 
 type genreUsecase struct {
@@ -44,4 +45,13 @@ func (gu *genreUsecase) UpdateGenre(genre model.Genre, genreId uint) (model.Genr
 	}
 
 	return genreRes, nil
+}
+
+// ジャンルを削除
+func (gu *genreUsecase) DeleteGenre(genreId uint) error {
+	if err := gu.gr.DeleteGenre(genreId); err != nil {
+		return err
+	}
+
+	return nil
 }

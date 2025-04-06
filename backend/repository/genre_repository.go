@@ -11,6 +11,7 @@ import (
 type IGenreRepository interface {
 	CreateGenre(genre *model.Genre) error
 	UpdateGenre(genre *model.Genre, genreId uint) error
+	DeleteGenre(genreId uint) error
 }
 
 type genreRepository struct {
@@ -52,6 +53,25 @@ func (gr *genreRepository) UpdateGenre(genre *model.Genre, genreId uint) error {
 	}
 
 	log.Printf("successfully updated genre with id %d\n", genreId)
+
+	return nil
+}
+
+// ジャンルを削除
+func (gr *genreRepository) DeleteGenre(genreId uint) error {
+	result := gr.db.Model(&model.Genre{}).Where("id = ?", genreId).Delete(&model.Genre{})
+
+	if result.Error != nil {
+		log.Printf("failed to delete genre with id %d: %v", genreId, result.Error)
+		return result.Error
+	}
+
+	if result.RowsAffected < 1 {
+		log.Printf("genre id %d not found\n", genreId)
+		return gorm.ErrRecordNotFound
+	}
+
+	log.Printf("successfully deleted genre with id %d\n", genreId)
 
 	return nil
 }
