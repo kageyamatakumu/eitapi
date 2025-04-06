@@ -16,6 +16,7 @@ func NewRouter(
 	wbc controller.IWordBookController,
 	wc controller.IWordController,
 	dc controller.IDifficultyController,
+	gc controller.IGenreController,
 ) *echo.Echo {
 	e := echo.New()
 
@@ -88,6 +89,10 @@ func NewRouter(
 	authorizedAdminDifficulty.POST("/", dc.CreateDifficulty)
 	authorizedAdminDifficulty.PUT("/:id", dc.UpdateDifficulty)
 	authorizedAdminDifficulty.DELETE("/:id", dc.DeleteDifficulty)
+
+	// 管理者用 ジャンルエンドポイント
+	authorizedAdminGenre := authorizedAdmin.Group("/genres")
+	authorizedAdminGenre.POST("/", gc.CreateGenre)
 
 	return e
 }
