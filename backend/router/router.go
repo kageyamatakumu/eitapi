@@ -93,6 +93,7 @@ func NewRouter(
 	// 管理者用 ジャンルエンドポイント
 	authorizedAdminGenre := authorizedAdmin.Group("/genres")
 	authorizedAdminGenre.POST("/", gc.CreateGenre)
+	authorizedAdminGenre.PUT("/:id", gc.UpdateGenre)
 
 	return e
 }
