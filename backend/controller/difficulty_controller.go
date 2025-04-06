@@ -10,6 +10,7 @@ import (
 )
 
 type IDifficultyController interface {
+	GetAllDifficultiesPublic(c echo.Context) error
 	GetAllDifficulties(c echo.Context) error
 	CreateDifficulty(c echo.Context) error
 	UpdateDifficulty(c echo.Context) error
@@ -25,6 +26,16 @@ func NewDifficultyController(du usecase.IDifficultyUsecase) IDifficultyControlle
 }
 
 // 公開エンドポイント（認証不要）
+
+// 難易度を全て取得(非認証)
+func (dc *difficultyController) GetAllDifficultiesPublic(c echo.Context) error {
+	difficulties, err := dc.du.GetAllDifficulties()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, difficulties)
+}
 
 // 認証が必要なエンドポイント
 
