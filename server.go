@@ -17,6 +17,7 @@ func main() {
 	adminValidator := validator.NewAdminValidator()
 	wordBookValidator := validator.NewWordBookValidator()
 	wordValidator := validator.NewWordValidator()
+	difficultyValidator := validator.NewDifficultyValidator()
 
 	// リポジトリの初期化
 	adminRepository := repository.NewAdminRepository(dbConn)
@@ -29,7 +30,7 @@ func main() {
 	adminUsecase := usecase.NewAdminUsecase(adminRepository, adminValidator)
 	wordBookUseCase := usecase.NewWordBookUsecase(wordBookRepository, wordBookValidator)
 	wordUseCase := usecase.NewWordUsecase(wordRepository, wordValidator)
-	difficultyUsecase := usecase.NewDifficultyUsecase(difficultyRepository)
+	difficultyUsecase := usecase.NewDifficultyUsecase(difficultyRepository, difficultyValidator)
 	genreUsecase := usecase.NewGenreUsecase(genreRepository)
 
 	// コントローラの初期化
