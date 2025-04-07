@@ -37,7 +37,7 @@ func (wr *wordRepository) GetAllWordsForWordBook(wordBookId uint, words *[]model
 
 // 英単語を取得
 func (wr *wordRepository) GetWordById(wordId uint, word *model.Word) error {
-	if err := wr.db.Where("id = ?", wordId).First(word).Error; err != nil {
+	if err := wr.db.Model(model.Word{}).Where("id = ?", wordId).First(word).Error; err != nil {
 		log.Printf("failed to get word with id %d: %v", wordId, err)
 		return err
 	}
@@ -47,7 +47,7 @@ func (wr *wordRepository) GetWordById(wordId uint, word *model.Word) error {
 
 // 英単語を新規作成
 func (wr *wordRepository) CreateMultipleWords(words *[]model.Word) error {
-	if err := wr.db.Create(words).Error; err != nil {
+	if err := wr.db.Model(model.Word{}).Create(words).Error; err != nil {
 		log.Printf("failed to create words: %v\n", err)
 		return err
 	}
@@ -84,7 +84,7 @@ func (wr *wordRepository) UpdateWord(word *model.Word, wordId uint) error {
 
 // 英単語を削除
 func (wr *wordRepository) DeleteWord(wordId uint) error {
-	result := wr.db.Where("id = ?", wordId).Delete(&model.Word{})
+	result := wr.db.Model(model.Word{}).Where("id = ?", wordId).Delete(&model.Word{})
 	if result.Error != nil {
 		log.Printf("failed to delete word with id %d: %v\n", wordId, result.Error)
 		return result.Error
