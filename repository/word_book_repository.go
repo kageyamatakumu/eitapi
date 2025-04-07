@@ -24,7 +24,7 @@ func NewWordBookRepository(db *gorm.DB) IWordBookRepository {
 
 // 英単語帳を全て取得
 func (wr *wordBookRepository) GetAllWordBook(wordBooks *[]model.WordBook) error {
-	if err := wr.db.Find(wordBooks).Error; err != nil {
+	if err := wr.db.Model(model.WordBook{}).Preload("Genre").Preload("Difficulty").Find(wordBooks).Error; err != nil {
 		log.Printf("failed to get all word books: %v", err)
 		return err
 	}
