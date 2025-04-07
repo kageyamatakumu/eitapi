@@ -7,7 +7,7 @@ import (
 )
 
 type ITWordBookUsecase interface {
-	GetAllWordBook() ([]model.WordBook, error)
+	GetAllWordBook() ([]model.WordBookListResponse, error)
 	CreateWordBook(model.WordBook) (model.WordBookResponse, error)
 	DeleteWordBook(wordBookId uint) error
 }
@@ -22,12 +22,24 @@ func NewWordBookUsecase(wr repository.IWordBookRepository, wbv validator.IWordBo
 }
 
 // 英単語帳を全て取得
-func (wu *wordBookUsecase) GetAllWordBook() ([]model.WordBook, error) {
+func (wu *wordBookUsecase) GetAllWordBook() ([]model.WordBookListResponse, error) {
 	var wordBooks []model.WordBook
 	if err := wu.wr.GetAllWordBook(&wordBooks); err != nil {
 		return nil, err
 	}
-	return wordBooks, nil
+
+	var resWordBooks []model.WordBookListResponse
+	for _, wordBook := range wordBooks {
+		resWordBooks = append(resWordBooks, model.WordBookListResponse{
+			ID:          wordBook.ID,
+			Title:       wordBook.Title,
+			Description: wordBook.Description,
+			Genre:       wordBook.Genre,
+			Difficulty:  wordBook.Difficulty,
+		})
+	}
+
+	return resWordBooks, nil
 }
 
 // 英単語帳を新規作成
