@@ -24,7 +24,7 @@ func NewAdminRepository(db *gorm.DB) IAdminRepository {
 
 // 管理者を新規作成
 func (ar *adminRepository) CreateAdmin(admin *model.Admin) error {
-	if err := ar.db.Create(admin).Error; err != nil {
+	if err := ar.db.Model(model.Admin{}).Create(admin).Error; err != nil {
 		log.Printf("failed to create admin: %v\n", err)
 		return err
 	}
@@ -36,7 +36,7 @@ func (ar *adminRepository) CreateAdmin(admin *model.Admin) error {
 
 // メールアドレスで管理者を取得
 func (ar *adminRepository) GetAdminByEmail(admin *model.Admin, email string) error {
-	if err := ar.db.Where("email = ?", email).First(admin).Error; err != nil {
+	if err := ar.db.Model(model.Admin{}).Where("email = ?", email).First(admin).Error; err != nil {
 		log.Printf("failed to get an admin by email %s: %v\n", email, err)
 		return err
 	}

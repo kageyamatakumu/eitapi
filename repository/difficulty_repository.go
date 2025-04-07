@@ -35,7 +35,7 @@ func (dr *difficultyRepository) GetAllDifficulties(difficulties *[]model.Difficu
 
 // 難易度を作成
 func (dr *difficultyRepository) CreateDifficulty(difficulty *model.Difficulty) error {
-	if err := dr.db.Create(difficulty).Error; err != nil {
+	if err := dr.db.Model(model.Difficulty{}).Create(difficulty).Error; err != nil {
 		log.Printf("failed to create difficulty: %v\n", err)
 		return err
 	}
@@ -69,7 +69,7 @@ func (dr *difficultyRepository) UpdateDifficulty(difficulty *model.Difficulty, d
 
 // 難易度を削除
 func (dr *difficultyRepository) DeleteDifficulty(difficultyId uint) error {
-	result := dr.db.Where("id = ?", difficultyId).Delete(&model.Difficulty{})
+	result := dr.db.Model(model.Difficulty{}).Where("id = ?", difficultyId).Delete(&model.Difficulty{})
 	if result.Error != nil {
 		log.Printf("failed to delete difficulty with id %d: %v", difficultyId, result.Error)
 		return result.Error
