@@ -3,6 +3,7 @@ package usecase
 import (
 	"backend/model"
 	"backend/repository"
+	"backend/validator"
 )
 
 type IDifficultyUsecase interface {
@@ -14,10 +15,11 @@ type IDifficultyUsecase interface {
 
 type difficultyUsecase struct {
 	dr repository.IDifficultyRepository
+	dv validator.IDifficultyValidator
 }
 
-func NewDifficultyUsecase(dr repository.IDifficultyRepository) IDifficultyUsecase {
-	return &difficultyUsecase{dr}
+func NewDifficultyUsecase(dr repository.IDifficultyRepository, dv validator.IDifficultyValidator) IDifficultyUsecase {
+	return &difficultyUsecase{dr, dv}
 }
 
 // 難易度を全て取得
@@ -39,6 +41,10 @@ func(du *difficultyUsecase) GetAllDifficulties() ([]model.DifficultyResponse, er
 
 // 難易度を作成
 func (du *difficultyUsecase) CreateDifficulty(difficulty model.Difficulty) (model.DifficultyResponse, error) {
+	if err := du.dv.ValidateDifficultyLevel(difficulty.DifficultyLevel); err != nil {
+		return model.DifficultyResponse{}, err
+	}
+
 	if err := du.dr.CreateDifficulty(&difficulty); err != nil {
 		return model.DifficultyResponse{}, err
 	}
@@ -53,6 +59,9 @@ func (du *difficultyUsecase) CreateDifficulty(difficulty model.Difficulty) (mode
 
 // 難易度を更新
 func (du *difficultyUsecase) UpdateDifficulty(difficulty model.Difficulty, difficultyId uint) (model.DifficultyResponse, error) {
+	if err := du.dv.ValidateDifficultyLevel(difficulty.DifficultyLevel); err != nil {
+		return model.DifficultyResponse{}, err
+	}
 	if err := du.dr.UpdateDifficulty(&difficulty, difficultyId); err != nil {
 		return model.DifficultyResponse{}, err
 	}
