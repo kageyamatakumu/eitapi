@@ -8,6 +8,7 @@ import (
 	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 func CreateDB() *gorm.DB {
@@ -21,7 +22,18 @@ func CreateDB() *gorm.DB {
 		os.Getenv("POSTGRES_PASSWORD"), os.Getenv("POSTGRES_HOST"),
 		os.Getenv("POSTGRES_PORT"), os.Getenv("POSTGRES_DATABASE"))
 
-	db, err := gorm.Open(postgres.Open(url), &gorm.Config{})
+	appEnv := os.Getenv("APP_ENV")
+	var gormLogLevel logger.LogLevel
+
+	if appEnv == "development" {
+		gormLogLevel = logger.Info
+	} else {
+		gormLogLevel = logger.Silent
+	}
+
+	db, err := gorm.Open(postgres.Open(url), &gorm.Config{
+		Logger: logger.Default.LogMode(gormLogLevel),
+	})
 	if err != nil {
 		log.Fatalln(err)
 	}
