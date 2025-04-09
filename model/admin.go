@@ -10,3 +10,13 @@ type Admin struct {
 	CreatedAt time.Time `json:"created_at" gorm:"autoCreateTime"`
 	UpdatedAt time.Time `json:"updated_at" gorm:"autoUpdateTime"`
 }
+
+type AdminRes struct {
+	ID       uint   `json:"id" gorm:"primaryKey;autoIncrement;not null;unique"`
+	Email    string `json:"email" gorm:"not null;unique;type:VARCHAR(255)"`
+	UserName string `json:"user_name" gorm:"default:'未設定';type:VARCHAR(255)"`
+}
+
+type UpdateUserNameRequest struct {
+	UserName string `json:"user_name" gorm:"default:'未設定';type:VARCHAR(255)"`
+}

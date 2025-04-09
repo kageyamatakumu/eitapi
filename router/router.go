@@ -69,6 +69,7 @@ func NewRouter(
 	// 管理者用エンドポイント
 	authorizedAdmin := authorizedApi.Group("/admins")
 	authorizedAdmin.POST("/", ac.CreateAdmin)
+	authorizedAdmin.PUT("/userName", ac.UpdateAdminUserName)
 
 	// 管理者用 英単語帳エンドポイント
 	authorizedAdminWordBook := authorizedAdmin.Group("/word-books")

@@ -7,12 +7,14 @@ import (
 	"os"
 	"time"
 
+	"github.com/golang-jwt/jwt/v4"
 	"github.com/labstack/echo/v4"
 )
 
 type IAdminController interface {
 	CreateAdmin(c echo.Context) error
 	LoginAdmin(c echo.Context) error
+	UpdateAdminUserName(c echo.Context) error
 }
 
 type adminController struct {
@@ -62,4 +64,28 @@ func (ac *adminController) LoginAdmin(c echo.Context) error {
 	c.SetCookie(cookie)
 
 	return c.NoContent(http.StatusOK)
+}
+
+// 管理者のユーザー名を更新
+func (ac *adminController) UpdateAdminUserName(c echo.Context) error {
+	user := c.Get("user").(*jwt.Token)
+	claims := user.Claims.(jwt.MapClaims)
+	userIdFloat, ok := claims["user_id"].(float64)
+	if !ok {
+		return c.JSON(http.StatusUnauthorized, "invalid user_id in token")
+	}
+	userId := uint(userIdFloat)
+
+	var req model.UpdateUserNameRequest
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
+
+	admin := model.Admin{}
+	updatedAdmin, err := ac.au.UpdateAdminUserName(admin, req.UserName, userId)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, updatedAdmin)
 }

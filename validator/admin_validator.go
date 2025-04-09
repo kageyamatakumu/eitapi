@@ -9,6 +9,7 @@ import (
 type IAdminValidator interface {
 	ValidateEmail(email string) error
 	ValidatePassword(password string) error
+	ValidateUserName(userName string) error
 }
 
 type adminValidator struct{}
@@ -64,6 +65,15 @@ func (av *adminValidator) ValidatePassword(password string) error {
 
 	if !hasLetter || !hasDigit || !hasSpecial {
 		return fmt.Errorf("パスワードは、英字、数字、記号をそれぞれ1文字以上含む必要があります")
+	}
+
+	return nil
+}
+
+// ユーザー名
+func (av *adminValidator) ValidateUserName(userName string) error {
+	if len(userName) > 255 {
+		return fmt.Errorf("ユーザー名が長すぎます")
 	}
 
 	return nil

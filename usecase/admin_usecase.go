@@ -14,6 +14,7 @@ import (
 type IAdminUsecase interface {
 	CreateAdmin(admin model.Admin) (model.Admin, error)
 	LoginAdmin(admin model.Admin) (string, error)
+	UpdateAdminUserName(admin model.Admin, adminUserName string, userId uint) (model.AdminRes, error)
 }
 
 type adminUsecase struct {
@@ -71,4 +72,23 @@ func (au *adminUsecase) LoginAdmin(admin model.Admin) (string, error) {
 	}
 
 	return tokenString, nil
+}
+
+// 管理者のユーザー名を更新
+func (au *adminUsecase) UpdateAdminUserName(admin model.Admin, adminUserName string, userId uint) (model.AdminRes, error) {
+	if err := au.av.ValidateUserName(adminUserName); err != nil {
+		return model.AdminRes{}, err
+	}
+
+	if err := au.ar.UpdateAdminUserName(&admin, adminUserName, userId); err != nil {
+		return model.AdminRes{}, err
+	}
+
+	adminRes := model.AdminRes{
+		ID:       admin.ID,
+		Email:    admin.Email,
+		UserName: admin.UserName,
+	}
+
+	return adminRes, nil
 }
