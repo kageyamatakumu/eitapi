@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
@@ -23,16 +24,23 @@ func CreateDB() *gorm.DB {
 		os.Getenv("POSTGRES_PORT"), os.Getenv("POSTGRES_DATABASE"))
 
 	appEnv := os.Getenv("APP_ENV")
-	var gormLogLevel logger.LogLevel
+	var gormLogger logger.Interface
 
 	if appEnv == "development" {
-		gormLogLevel = logger.Info
+		gormLogger = logger.New(
+			log.New(os.Stdout, "\r\n", log.LstdFlags),
+			logger.Config{
+				SlowThreshold: time.Second,
+				LogLevel:      logger.Info,
+				Colorful:      true,
+			},
+		)
 	} else {
-		gormLogLevel = logger.Silent
+		gormLogger = logger.Default.LogMode(logger.Silent)
 	}
 
 	db, err := gorm.Open(postgres.Open(url), &gorm.Config{
-		Logger: logger.Default.LogMode(gormLogLevel),
+		Logger: gormLogger,
 	})
 	if err != nil {
 		log.Fatalln(err)
