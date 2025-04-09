@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type IAdminRepository interface {
@@ -12,6 +13,8 @@ type IAdminRepository interface {
 	CreateAdmin(admin *model.Admin) error
 	// メールアドレスで管理者を取得
 	GetAdminByEmail(admin *model.Admin, email string) error
+	// 管理者のユーザー名を更新
+	UpdateAdminUserName(admin *model.Admin, adminUserName string, userId uint) error
 }
 
 type adminRepository struct {
@@ -40,5 +43,20 @@ func (ar *adminRepository) GetAdminByEmail(admin *model.Admin, email string) err
 		log.Printf("failed to get an admin by email %s: %v\n", email, err)
 		return err
 	}
+	return nil
+}
+
+// 管理者のユーザー名を更新
+func (ar *adminRepository) UpdateAdminUserName(admin *model.Admin, adminUserName string, userId uint) error {
+	if err := ar.db.Model(admin).
+		Clauses(clause.Returning{}).
+		Where("id = ?", userId).
+		Update("user_name", adminUserName).Error; err != nil {
+
+		log.Printf("failed to update admin user name (userID: %d): %v\n", userId, err)
+		return err
+	}
+
+	log.Printf("successfully updated admin user name to '%s' (userID: %d)\n", admin.UserName, userId)
 	return nil
 }
