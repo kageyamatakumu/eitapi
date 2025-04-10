@@ -13,7 +13,13 @@ func Test_adminRepository_CreateAdmin(t *testing.T) {
 	db := SetupTestDB()
 	// テスト後にDBをクリーンアップする
 	defer func() {
-		_ = db.Migrator().DropTable(&model.Admin{})
+		_ = db.Migrator().DropTable(
+			&model.Admin{},
+			&model.Player{},
+			&model.WordBook{},
+			&model.Word{},
+			&model.Genre{},
+			&model.Difficulty{})
 	}()
 
 	repo := NewAdminRepository(db)
@@ -29,9 +35,9 @@ func Test_adminRepository_CreateAdmin(t *testing.T) {
 		// TODO: Add test cases.
 		{"success", &model.Admin{Email: "test@example.com", Password: "password123"}, false},
 		{"duplicate email", &model.Admin{Email: "test@example.com", Password: "password123"}, true},
-		{"email too long", &model.Admin{Email: longString, Password: "password123"}, false}, // SQLite ではエラーが発生しないため、wantErr を false に変更
-		{"password too long", &model.Admin{Email: "test2@example.com", Password: longString},false}, // SQLite ではエラーが発生しないため、wantErr を false に変更
-		{"all fields too long", &model.Admin{Email: longString2, Password: longString}, false}, // SQLite ではエラーが発生しないため、wantErr を false に変更
+		{"email too long", &model.Admin{Email: longString, Password: "password123"}, false},          // SQLite ではエラーが発生しないため、wantErr を false に変更
+		{"password too long", &model.Admin{Email: "test2@example.com", Password: longString}, false}, // SQLite ではエラーが発生しないため、wantErr を false に変更
+		{"all fields too long", &model.Admin{Email: longString2, Password: longString}, false},       // SQLite ではエラーが発生しないため、wantErr を false に変更
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -55,7 +61,13 @@ func Test_adminRepository_GetAdminByEmail(t *testing.T) {
 	db := SetupTestDB()
 	// テスト後にDBをクリーンアップする
 	defer func() {
-		_ = db.Migrator().DropTable(&model.Admin{})
+		_ = db.Migrator().DropTable(
+			&model.Admin{},
+			&model.Player{},
+			&model.WordBook{},
+			&model.Word{},
+			&model.Genre{},
+			&model.Difficulty{})
 	}()
 
 	repo := NewAdminRepository(db)
@@ -90,7 +102,13 @@ func Test_adminRepository_GetAdminByEmail(t *testing.T) {
 func Test_adminRepository_UpdateAdminUserName(t *testing.T) {
 	db := SetupTestDB()
 	defer func() {
-		_ = db.Migrator().DropTable(&model.Admin{})
+		_ = db.Migrator().DropTable(
+			&model.Admin{},
+			&model.Player{},
+			&model.WordBook{},
+			&model.Word{},
+			&model.Genre{},
+			&model.Difficulty{})
 	}()
 
 	repo := NewAdminRepository(db)

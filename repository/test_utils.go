@@ -14,8 +14,18 @@ func SetupTestDB() *gorm.DB {
 		panic("failed to open test database")
 	}
 
+	// 外部キー制約を有効化
+	db.Exec("PRAGMA foreign_keys = ON")
+
 	// マイグレーション実行
-	if err := db.AutoMigrate(&model.WordBook{}, &model.Admin{}); err != nil { // 複数のモデルをマイグレートする場合
+	if err := db.AutoMigrate(
+		&model.Admin{},
+		&model.Player{},
+		&model.WordBook{},
+		&model.Word{},
+		&model.Genre{},
+		&model.Difficulty{},
+	); err != nil { // 複数のモデルをマイグレートする場合
 		panic("failed to migrate test database")
 	}
 

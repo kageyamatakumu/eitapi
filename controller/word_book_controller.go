@@ -8,6 +8,7 @@ import (
 
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/labstack/echo/v4"
+	"gorm.io/gorm"
 )
 
 type IWordBookController interface {
@@ -82,7 +83,7 @@ func (wc *wordBookController) DeleteWordBook(c echo.Context) error {
 	wordBookIdUint := uint(wordBookId)
 
 	if err := wc.wu.DeleteWordBook(wordBookIdUint); err != nil {
-		if err.Error() == "object does not exist" {
+		if err.Error() == gorm.ErrRecordNotFound.Error() {
 			return c.JSON(http.StatusNotFound, "word book not found")
 		}
 		return c.JSON(http.StatusInternalServerError, "failed to delete word book")
