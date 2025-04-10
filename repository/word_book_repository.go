@@ -2,7 +2,6 @@ package repository
 
 import (
 	"backend/model"
-	"fmt"
 	"log"
 
 	"gorm.io/gorm"
@@ -53,7 +52,7 @@ func (wr *wordBookRepository) DeleteWordBook(wordBookId uint) error {
 
 	if result.RowsAffected < 1 {
 		log.Printf("word book id %d not found\n", wordBookId)
-		return fmt.Errorf("object does not exist")
+		return gorm.ErrRecordNotFound
 	}
 
 	log.Printf("successfully deleted word book with id %d\n", wordBookId)
