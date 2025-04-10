@@ -48,15 +48,19 @@ func (ar *adminRepository) GetAdminByEmail(admin *model.Admin, email string) err
 
 // 管理者のユーザー名を更新
 func (ar *adminRepository) UpdateAdminUserName(admin *model.Admin, adminUserName string, userId uint) error {
-	if err := ar.db.Model(admin).
-		Clauses(clause.Returning{}).
-		Where("id = ?", userId).
-		Update("user_name", adminUserName).Error; err != nil {
+	result := ar.db.Model(admin).Clauses(clause.Returning{}).Where("id = ?", userId).Update("user_name", adminUserName)
 
-		log.Printf("failed to update admin user name (userID: %d): %v\n", userId, err)
-		return err
+	if result.Error != nil {
+		log.Printf("failed to update admin user name (userID: %d): %v\n", userId, result.Error)
+		return result.Error
+	}
+
+	if result.RowsAffected < 1 {
+		log.Printf("admin id %d not found\n", userId)
+		return gorm.ErrRecordNotFound
 	}
 
 	log.Printf("successfully updated admin user name to '%s' (userID: %d)\n", admin.UserName, userId)
+
 	return nil
 }
