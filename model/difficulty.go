@@ -12,12 +12,12 @@ const (
 
 type Difficulty struct {
 	ID              uint            `json:"id" gorm:"primaryKey;autoIncrement;not null;unique"`
-	DifficultyLevel DifficultyLevel `json:"difficulty_level" gorm:"not null"`
+	DifficultyLevel DifficultyLevel `json:"difficulty_level" gorm:"not null;unique"`
 	CreatedAt       time.Time       `json:"created_at" gorm:"autoCreateTime"`
 	UpdatedAt       time.Time       `json:"updated_at" gorm:"autoUpdateTime"`
 }
 
 type DifficultyResponse struct {
 	ID              uint            `json:"id" gorm:"primaryKey;autoIncrement;not null;unique"`
-	DifficultyLevel DifficultyLevel `json:"difficulty_level" gorm:"not null"`
+	DifficultyLevel DifficultyLevel `json:"difficulty_level" gorm:"not null;unique"`
 }
