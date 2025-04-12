@@ -1,7 +1,6 @@
 package repository
 
 import (
-	"fmt"
 	"log"
 
 	"backend/model"
@@ -74,7 +73,7 @@ func (wr *wordRepository) UpdateWord(word *model.Word, wordId uint) error {
 
 	if result.RowsAffected < 1 {
 		log.Printf("failed to update word with id %d: %v\n", wordId, result.Error)
-		return fmt.Errorf("object does not exist")
+		return gorm.ErrRecordNotFound
 	}
 
 	log.Printf("successfully updated word with id %d\n", wordId)
@@ -92,7 +91,7 @@ func (wr *wordRepository) DeleteWord(wordId uint) error {
 
 	if result.RowsAffected < 1 {
 		log.Printf("word with id %d not found\n", wordId)
-		return fmt.Errorf("object does not exist")
+		return gorm.ErrRecordNotFound
 	}
 
 	log.Printf("successfully deleted word with id %d\n", wordId)
