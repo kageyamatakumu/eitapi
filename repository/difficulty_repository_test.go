@@ -26,8 +26,8 @@ func Test_difficultyRepository_GetAllDifficulties(t *testing.T) {
 
 	// テストデータ準備
 	difficulties := []model.Difficulty{
-		{DifficultyLevel: 1},
-		{DifficultyLevel: 2},
+		{DifficultyLevel: model.Easy},
+		{DifficultyLevel: model.Hard},
 	}
 	db.Create(&difficulties)
 
@@ -81,7 +81,7 @@ func Test_difficultyRepository_CreateDifficulty(t *testing.T) {
 	repo := NewDifficultyRepository(db)
 
 	// 重複テスト用のデータ作成
-	difficulty := model.Difficulty{DifficultyLevel: 2}
+	difficulty := model.Difficulty{DifficultyLevel: model.Hard}
 	db.Create(&difficulty)
 
 	tests := []struct {
@@ -90,8 +90,8 @@ func Test_difficultyRepository_CreateDifficulty(t *testing.T) {
 		wantErr    bool
 	}{
 		// TODO: Add test cases.
-		{"success", &model.Difficulty{DifficultyLevel: 1}, false},
-		{"duplicate", &model.Difficulty{DifficultyLevel: 2}, true},
+		{"success", &model.Difficulty{DifficultyLevel: model.Easy}, false},
+		{"duplicate", &model.Difficulty{DifficultyLevel: model.Hard}, true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -126,7 +126,7 @@ func Test_difficultyRepository_UpdateDifficulty(t *testing.T) {
 	repo := NewDifficultyRepository(db)
 
 	// テスト用のデータ作成
-	difficulties := []model.Difficulty{{DifficultyLevel: 1}, {DifficultyLevel: 2}}
+	difficulties := []model.Difficulty{{DifficultyLevel: model.Easy}, {DifficultyLevel: model.Hard}}
 	for _, g := range difficulties {
 		db.Create(&g)
 	}
@@ -138,9 +138,9 @@ func Test_difficultyRepository_UpdateDifficulty(t *testing.T) {
 		wantErr      bool
 	}{
 		// TODO: Add test cases.
-		{"success", &model.Difficulty{DifficultyLevel: 3}, 1, false},
-		{"duplicate", &model.Difficulty{DifficultyLevel: 3}, 2, true},
-		{"not found", &model.Difficulty{DifficultyLevel: 1}, 999, true},
+		{"success", &model.Difficulty{DifficultyLevel: model.Medium}, 1, false},
+		{"duplicate", &model.Difficulty{DifficultyLevel: model.Medium}, 2, true},
+		{"not found", &model.Difficulty{DifficultyLevel: model.Easy}, 999, true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -154,8 +154,9 @@ func Test_difficultyRepository_UpdateDifficulty(t *testing.T) {
 				assert.NoError(t, result.Error)
 				assert.Equal(t, tt.difficulty.DifficultyLevel, updateDifficulty.DifficultyLevel)
 			} else {
-				if err == gorm.ErrRecordNotFound {
-					assert.Equal(t, "record not found", err.Error())
+				if tt.name == "not found" {
+					assert.Equal(t, gorm.ErrRecordNotFound, err)
+					assert.Equal(t, gorm.ErrRecordNotFound.Error(), err.Error())
 				}
 			}
 		})
@@ -179,7 +180,7 @@ func Test_difficultyRepository_DeleteDifficulty(t *testing.T) {
 	repo := NewDifficultyRepository(db)
 
 	// テスト用のデータ作成
-	difficulties := []model.Difficulty{{DifficultyLevel: 1}, {DifficultyLevel: 2}}
+	difficulties := []model.Difficulty{{DifficultyLevel: model.Easy}, {DifficultyLevel: model.Hard}}
 	db.Create(difficulties)
 
 	tests := []struct {
@@ -189,7 +190,7 @@ func Test_difficultyRepository_DeleteDifficulty(t *testing.T) {
 	}{
 		// TODO: Add test cases.
 		{"success", difficulties[0].ID, false},
-		{"difficulty not found", 999, true},
+		{"not found", 999, true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -203,9 +204,9 @@ func Test_difficultyRepository_DeleteDifficulty(t *testing.T) {
 				assert.Error(t, result.Error)
 				assert.Equal(t, gorm.ErrRecordNotFound, result.Error)
 			} else {
-				// エラーメッセージの検証
-				if tt.name == "difficulty not found" {
+				if tt.name == "not found" {
 					assert.Equal(t, gorm.ErrRecordNotFound, err)
+					assert.Equal(t, gorm.ErrRecordNotFound.Error(), err.Error())
 				}
 			}
 		})
