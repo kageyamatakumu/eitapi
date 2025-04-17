@@ -1,4 +1,4 @@
-name: Lint
+name: Lint and Test
 
 on:
   pull_request:
@@ -38,6 +38,27 @@ jobs:
       - name: Verify golangci-lint installation
         run: golangci-lint --version
 
-
       - name: Run golangci-lint
         run: golangci-lint
+
+  test:
+    name: Golang Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: ./go.mod
+          cache: true
+          cache-dependency-path: |
+            ./go.sum
+            ./go.mod
+
+      - name: Install Dependencies
+        run: go mod download
+
+      - name: Run tests
+        run: go test -v ./...
