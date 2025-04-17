@@ -2,7 +2,6 @@ package repository
 
 import (
 	"backend/model"
-	"strings"
 	"testing"
 	"time"
 
@@ -92,8 +91,6 @@ func Test_wordBookRepository_CreateWordBook(t *testing.T) {
 
 	repo := NewWordBookRepository(db)
 
-	longString := strings.Repeat("a", 256)
-
 	// テストデータ準備
 	admin := model.Admin{Email: "test@example.com", Password: "password123"}
 	db.Create(&admin)
@@ -113,7 +110,6 @@ func Test_wordBookRepository_CreateWordBook(t *testing.T) {
 		{"admin not found", &model.WordBook{Title: "admin not found test word book", Description: "test description", AdminId: 999, GenreId: genre.ID, DifficultyId: difficulty.ID}, true},
 		{"genre not found", &model.WordBook{Title: "genre not found test word book", Description: "test description", AdminId: admin.ID, GenreId: 999, DifficultyId: difficulty.ID}, true},
 		{"difficulty not found", &model.WordBook{Title: "difficulty not found test word book", Description: "test description", AdminId: admin.ID, GenreId: genre.ID, DifficultyId: 999}, true},
-		{"title too long", &model.WordBook{Title: longString, Description: "test description", AdminId: admin.ID, GenreId: genre.ID, DifficultyId: difficulty.ID}, false}, // SQLite ではエラーが発生しないため、wantErr を false に変更
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -175,7 +171,7 @@ func Test_wordBookRepository_DeleteWordBook(t *testing.T) {
 	}{
 		// TODO: Add test cases.
 		{"success", wordBooks[0].ID, false},
-		{"word book not found", 999, true},
+		{"not found", 999, true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -189,9 +185,9 @@ func Test_wordBookRepository_DeleteWordBook(t *testing.T) {
 				result := db.Where("id = ?", tt.wordBookId).First(&gotWordBook)
 				assert.Error(t, result.Error) // データが存在しないことを検証
 			} else {
-				// エラーメッセージの検証
-				if tt.name == "word book not found" {
-					assert.Equal(t, gorm.ErrRecordNotFound, err) // エラーメッセージを検証
+				if tt.name == "not found" {
+					assert.Equal(t, gorm.ErrRecordNotFound, err)
+					assert.Equal(t, gorm.ErrRecordNotFound.Error(), err.Error())
 				}
 			}
 		})
