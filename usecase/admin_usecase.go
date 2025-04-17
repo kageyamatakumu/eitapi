@@ -4,6 +4,7 @@ import (
 	"backend/model"
 	"backend/repository"
 	"backend/validator"
+	"errors"
 	"os"
 	"time"
 
@@ -58,7 +59,7 @@ func (au *adminUsecase) LoginAdmin(admin model.Admin) (string, error) {
 
 	err := bcrypt.CompareHashAndPassword([]byte(storedAdmin.Password), []byte(admin.Password))
 	if err != nil {
-		return "", err
+		return "", errors.New("password does not match")
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
