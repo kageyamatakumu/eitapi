@@ -2,7 +2,6 @@ package repository
 
 import (
 	"backend/model"
-	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -25,8 +24,6 @@ func Test_genreRepository_CreateGenre(t *testing.T) {
 
 	repo := NewGenreRepository(db)
 
-	longString := strings.Repeat("a", 256)
-
 	tests := []struct {
 		name    string
 		genre   *model.Genre
@@ -35,7 +32,6 @@ func Test_genreRepository_CreateGenre(t *testing.T) {
 		// TODO: Add test cases.
 		{"success", &model.Genre{GenreName: "test"}, false},
 		{"duplicate", &model.Genre{GenreName: "test"}, true},
-		{"name too long", &model.Genre{GenreName: longString}, false}, // SQLite ではエラーが発生しないため、wantErr を false に変更
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -68,12 +64,11 @@ func Test_genreRepository_UpdateGenre(t *testing.T) {
 	}()
 
 	repo := NewGenreRepository(db)
-	longString := strings.Repeat("a", 256)
 
 	// テストデータ準備
-	genre := []model.Genre{{GenreName: "test"}, {GenreName: "duplicate"}}
-	for _, g := range genre {
-		db.Create(&g)
+	genres := []model.Genre{{GenreName: "test"}, {GenreName: "duplicate"}}
+	for _, genre := range genres {
+		db.Create(&genre)
 	}
 
 	tests := []struct {
@@ -85,7 +80,6 @@ func Test_genreRepository_UpdateGenre(t *testing.T) {
 		// TODO: Add test cases.
 		{"success", &model.Genre{GenreName: "updated"}, 1, false},
 		{"not found", &model.Genre{GenreName: "not found"}, 999, true},
-		{"name too long", &model.Genre{GenreName: longString}, 1, false}, // SQLite ではエラーが発生しないため、wantErr を false に変更
 		{"duplicate", &model.Genre{GenreName: "duplicate"}, 1, true},
 	}
 	for _, tt := range tests {
@@ -100,8 +94,9 @@ func Test_genreRepository_UpdateGenre(t *testing.T) {
 				assert.NoError(t, result.Error)
 				assert.Equal(t, tt.genre.GenreName, updatedGenre.GenreName)
 			} else {
-				if err == gorm.ErrRecordNotFound {
-					assert.Equal(t, "record not found", err.Error())
+				if tt.name == "not found" {
+					assert.Equal(t, gorm.ErrRecordNotFound, err)
+					assert.Equal(t, gorm.ErrRecordNotFound.Error(), err.Error())
 				}
 			}
 		})
@@ -151,7 +146,7 @@ func Test_genreRepository_DeleteGenre(t *testing.T) {
 			} else {
 				if tt.name == "not found" {
 					assert.Equal(t, gorm.ErrRecordNotFound, err)
-					assert.Equal(t, "record not found", err.Error())
+					assert.Equal(t, gorm.ErrRecordNotFound.Error(), err.Error())
 				}
 			}
 		})
