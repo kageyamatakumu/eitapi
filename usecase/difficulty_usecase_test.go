@@ -6,6 +6,8 @@ import (
 	"reflect"
 	"testing"
 
+	"gorm.io/gorm"
+
 	"github.com/stretchr/testify/mock"
 )
 
@@ -212,9 +214,9 @@ func Test_difficultyUsecase_UpdateDifficulty(t *testing.T) {
 	}{
 		// TODO: Add test cases.
 		{
-			name:         "正常系: 難易度更新成功",
-			input:        model.Difficulty{DifficultyLevel: model.Hard},
-			inputId:      1,
+			name:    "正常系: 難易度更新成功",
+			input:   model.Difficulty{DifficultyLevel: model.Hard},
+			inputId: 1,
 			mockRepoSetup: func(mockRepo *IDifficultyRepositoryMock) {
 				mockRepo.On("UpdateDifficulty", mock.Anything, uint(1)).Run(func(args mock.Arguments) {
 					ptr := args.Get(0).(*model.Difficulty)
@@ -277,6 +279,59 @@ func Test_difficultyUsecase_UpdateDifficulty(t *testing.T) {
 
 			mockRepo.AssertExpectations(t)
 			mockValidator.AssertExpectations(t)
+		})
+	}
+}
+
+func Test_difficultyUsecase_DeleteDifficulty(t *testing.T) {
+	tests := []struct {
+		name      string
+		inputId   uint
+		mockSetup func(mockRepo *IDifficultyRepositoryMock)
+		wantErr   bool
+	}{
+		// TODO: Add test cases.
+		{
+			name:    "正常系: 難易度削除成功",
+			inputId: 1,
+			mockSetup: func(mockRepo *IDifficultyRepositoryMock) {
+				mockRepo.On("DeleteDifficulty", uint(1)).Return(nil)
+			},
+			wantErr: false,
+		},
+		{
+			name:    "異常系: DBエラーが発生",
+			inputId: 2,
+			mockSetup: func(mockRepo *IDifficultyRepositoryMock) {
+				mockRepo.On("DeleteDifficulty", uint(2)).Return(errors.New("db error")).Once()
+			},
+			wantErr: true,
+		},
+		{
+			name:    "異常系: 削除対象が存在せず RecordNotFound エラー",
+			inputId: 999,
+			mockSetup: func(mockRepo *IDifficultyRepositoryMock) {
+				mockRepo.On("DeleteDifficulty", uint(999)).Return(gorm.ErrRecordNotFound)
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mockRepo := new(IDifficultyRepositoryMock)
+			mockValidator := new(IDifficultyValidatorMock)
+
+			tt.mockSetup(mockRepo)
+
+			uc := NewDifficultyUsecase(mockRepo, mockValidator)
+
+			err := uc.DeleteDifficulty(tt.inputId)
+
+			if (err != nil) != tt.wantErr {
+				t.Errorf("unexpected error: err %v, wantErr %v", err, tt.wantErr)
+			}
+
+			mockRepo.AssertExpectations(t)
 		})
 	}
 }
