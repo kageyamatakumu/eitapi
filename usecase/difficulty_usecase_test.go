@@ -164,7 +164,7 @@ func Test_difficultyUsecase_CreateDifficulty(t *testing.T) {
 			name:  "異常系: 不正なDifficultyLevelでバリデーションエラー → Repositoryが呼ばれない",
 			input: model.Difficulty{ID: 2, DifficultyLevel: 4},
 			mockRepoSetup: func(mockRepo *IDifficultyRepositoryMock) {
-				 // バリデーションで失敗するため、Repositoryは呼ばれない
+				// バリデーションで失敗するため、Repositoryは呼ばれない
 			},
 			mockValidatorSetup: func(mockValidator *IDifficultyValidatorMock) {
 				mockValidator.On("ValidateDifficultyLevel", mock.Anything).Return(errors.New("validate error"))
@@ -184,6 +184,87 @@ func Test_difficultyUsecase_CreateDifficulty(t *testing.T) {
 			uc := NewDifficultyUsecase(mockRepo, mockValidator)
 
 			got, err := uc.CreateDifficulty(tt.input)
+
+			if (err != nil) != tt.wantErr {
+				t.Errorf("unexpected error: got %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("unexpected result: got %+v, want %+v", got, tt.want)
+			}
+
+			mockRepo.AssertExpectations(t)
+			mockValidator.AssertExpectations(t)
+		})
+	}
+}
+
+func Test_difficultyUsecase_UpdateDifficulty(t *testing.T) {
+	tests := []struct {
+		name               string
+		input              model.Difficulty
+		inputId            uint
+		mockRepoSetup      func(mockRepo *IDifficultyRepositoryMock)
+		mockValidatorSetup func(mockValidator *IDifficultyValidatorMock)
+		want               model.DifficultyResponse
+		wantErr            bool
+	}{
+		// TODO: Add test cases.
+		{
+			name:         "正常系: 難易度更新成功",
+			input:        model.Difficulty{DifficultyLevel: model.Hard},
+			inputId:      1,
+			mockRepoSetup: func(mockRepo *IDifficultyRepositoryMock) {
+				mockRepo.On("UpdateDifficulty", mock.Anything, uint(1)).Run(func(args mock.Arguments) {
+					ptr := args.Get(0).(*model.Difficulty)
+					*ptr = model.Difficulty{ID: 1, DifficultyLevel: model.Hard}
+				}).Return(nil)
+			},
+			mockValidatorSetup: func(mockValidator *IDifficultyValidatorMock) {
+				mockValidator.On("ValidateDifficultyLevel", mock.Anything).Return(nil)
+			},
+			want:    model.DifficultyResponse{ID: 1, DifficultyLevel: model.Hard},
+			wantErr: false,
+		},
+		{
+			name:    "異常系: DBエラーが発生",
+			input:   model.Difficulty{DifficultyLevel: model.Hard},
+			inputId: 99,
+			mockRepoSetup: func(mockRepo *IDifficultyRepositoryMock) {
+				mockRepo.On("UpdateDifficulty", mock.Anything, uint(99)).Return(errors.New("db error"))
+			},
+			mockValidatorSetup: func(mockValidator *IDifficultyValidatorMock) {
+				mockValidator.On("ValidateDifficultyLevel", model.Hard).Return(nil)
+			},
+			want:    model.DifficultyResponse{},
+			wantErr: true,
+		},
+		{
+			name:    "異常系: 不正なDifficultyLevelでバリデーションエラー → Repositoryが呼ばれない",
+			input:   model.Difficulty{DifficultyLevel: model.Hard},
+			inputId: 1,
+			mockRepoSetup: func(mockRepo *IDifficultyRepositoryMock) {
+				// バリデーションで失敗するため、Repositoryは呼ばれない
+			},
+			mockValidatorSetup: func(mockValidator *IDifficultyValidatorMock) {
+				mockValidator.On("ValidateDifficultyLevel", model.Hard).Return(errors.New("validate error"))
+			},
+			want:    model.DifficultyResponse{},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mockRepo := new(IDifficultyRepositoryMock)
+			mockValidator := new(IDifficultyValidatorMock)
+
+			tt.mockRepoSetup(mockRepo)
+			tt.mockValidatorSetup(mockValidator)
+
+			uc := NewDifficultyUsecase(mockRepo, mockValidator)
+
+			got, err := uc.UpdateDifficulty(tt.input, tt.inputId)
 
 			if (err != nil) != tt.wantErr {
 				t.Errorf("unexpected error: got %v, wantErr %v", err, tt.wantErr)
