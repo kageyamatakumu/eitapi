@@ -20,41 +20,21 @@ type IDifficultyRepositoryMock struct {
 func (m *IDifficultyRepositoryMock) GetAllDifficulties(difficulties *[]model.Difficulty) error {
 	args := m.Called(difficulties)
 	return args.Error(0)
-
-	// mockRepo := new(IDifficultyRepositoryMock)
-	// mockRepo.On("GetAllDifficulties", mock.Anything).Run(func(args mock.Arguments) {
-	// 	ptr := args.Get(0).(*[]model.Difficulty)
-	// 	*ptr = []model.Difficulty{
-	// 		{ID: 1, DifficultyLevel: "Easy"},
-	// 		{ID: 2, DifficultyLevel: "Hard"},
-	// 	}
-	// }).Return(nil)
 }
 
 func (m *IDifficultyRepositoryMock) CreateDifficulty(difficulty *model.Difficulty) error {
 	args := m.Called(difficulty)
 	return args.Error(0)
-
-	// mockRepo := new(IDifficultyRepositoryMock)
-	// mockRepo.On("CreateDifficulty", mock.Anything).Return(nil)
 }
 
 func (m *IDifficultyRepositoryMock) UpdateDifficulty(difficulty *model.Difficulty, difficultyId uint) error {
 	args := m.Called(difficulty, difficultyId)
 	return args.Error(0)
-
-	// mockRepo := new(IDifficultyRepositoryMock)
-	// mockRepo.On("UpdateDifficulty",  mock.Anything, mock.Anything).Return(nil)
 }
 
 func (m *IDifficultyRepositoryMock) DeleteDifficulty(difficultyId uint) error {
 	args := m.Called(difficultyId)
 	return args.Error(0)
-
-	// mockRepo := new(IDifficultyRepositoryMock)
-	// mockRepo.On("DeleteDifficulty", mock.Anything).Return(nil)
-	// mockRepo.On("DeleteDifficulty", uint(1)).Return(nil)
-	// mockRepo.On("DeleteDifficulty", uint(999)).Return(errors.New("not found"))
 }
 
 type IDifficultyValidatorMock struct {
@@ -232,9 +212,22 @@ func Test_difficultyUsecase_UpdateDifficulty(t *testing.T) {
 		{
 			name:    "異常系: DBエラーが発生",
 			input:   model.Difficulty{DifficultyLevel: model.Hard},
-			inputId: 99,
+			inputId: 1,
 			mockRepoSetup: func(mockRepo *IDifficultyRepositoryMock) {
-				mockRepo.On("UpdateDifficulty", mock.Anything, uint(99)).Return(errors.New("db error"))
+				mockRepo.On("UpdateDifficulty", mock.Anything, uint(1)).Return(errors.New("db error"))
+			},
+			mockValidatorSetup: func(mockValidator *IDifficultyValidatorMock) {
+				mockValidator.On("ValidateDifficultyLevel", model.Hard).Return(nil)
+			},
+			want:    model.DifficultyResponse{},
+			wantErr: true,
+		},
+		{
+			name:    "異常系: 削除対象が存在せず RecordNotFound エラー",
+			input:   model.Difficulty{DifficultyLevel: model.Hard},
+			inputId: 999,
+			mockRepoSetup: func(mockRepo *IDifficultyRepositoryMock) {
+				mockRepo.On("UpdateDifficulty", mock.Anything, uint(999)).Return(gorm.ErrRecordNotFound)
 			},
 			mockValidatorSetup: func(mockValidator *IDifficultyValidatorMock) {
 				mockValidator.On("ValidateDifficultyLevel", model.Hard).Return(nil)
