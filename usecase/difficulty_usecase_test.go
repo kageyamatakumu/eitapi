@@ -328,7 +328,7 @@ func Test_difficultyUsecase_DeleteDifficulty(t *testing.T) {
 			err := uc.DeleteDifficulty(tt.inputId)
 
 			if (err != nil) != tt.wantErr {
-				t.Errorf("difficultyUsecase.DeleteDifficulty() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("unexpected error: err %v, wantErr %v", err, tt.wantErr)
 			}
 
 			mockRepo.AssertExpectations(t)
