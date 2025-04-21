@@ -53,7 +53,7 @@ func Test_wordBookRepository_GetAllWordBook(t *testing.T) {
 				db.Where("1 = 1").Delete(&model.WordBook{})
 			}
 			var gotWordBooks []model.WordBook
-			err := repo.GetAllWordBook(&gotWordBooks)
+			err := repo.GetAllWordBooks(&gotWordBooks)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("GetAllWordBook() error = %v, wantErr %v", err, tt.wantErr)
 			}

@@ -30,7 +30,7 @@ func NewWordBookController(wu usecase.ITWordBookUsecase) IWordBookController {
 
 // 英単語帳を全て取得(非認証)
 func (wc *wordBookController) GetAllWordBooksPublic(c echo.Context) error {
-	wordBooks, err := wc.wu.GetAllWordBook()
+	wordBooks, err := wc.wu.GetAllWordBooks()
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
@@ -41,7 +41,7 @@ func (wc *wordBookController) GetAllWordBooksPublic(c echo.Context) error {
 
 // 英単語帳を全て取得
 func (wc *wordBookController) GetAllWordBooks(c echo.Context) error {
-	wordBooks, err := wc.wu.GetAllWordBook()
+	wordBooks, err := wc.wu.GetAllWordBooks()
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}

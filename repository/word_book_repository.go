@@ -8,7 +8,7 @@ import (
 )
 
 type IWordBookRepository interface {
-	GetAllWordBook(wordBooks *[]model.WordBook) error
+	GetAllWordBooks(wordBooks *[]model.WordBook) error
 	CreateWordBook(wordBook *model.WordBook) error
 	DeleteWordBook(wordBookId uint) error
 }
@@ -22,7 +22,7 @@ func NewWordBookRepository(db *gorm.DB) IWordBookRepository {
 }
 
 // 英単語帳を全て取得
-func (wr *wordBookRepository) GetAllWordBook(wordBooks *[]model.WordBook) error {
+func (wr *wordBookRepository) GetAllWordBooks(wordBooks *[]model.WordBook) error {
 	if err := wr.db.Model(model.WordBook{}).Preload("Genre").Preload("Difficulty").Find(wordBooks).Error; err != nil {
 		log.Printf("failed to get all word books: %v", err)
 		return err
